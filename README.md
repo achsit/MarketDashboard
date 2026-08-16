@@ -4,7 +4,7 @@ Daily Market Dashboards with Snapshots — a single-page visual briefing arrange
 
 ## Overview
 
-This project automatically captures screenshots of key financial dashboards and assembles them into a single-page HTML dashboard and a captioned PDF report. It runs on a daily schedule via GitHub Actions.
+This project automatically captures screenshots of key financial dashboards and publishes them in a single-page HTML dashboard. It runs daily via GitHub Actions and is published publicly with GitHub Pages.
 
 ### Dashboard Sections
 
@@ -21,43 +21,37 @@ This project automatically captures screenshots of key financial dashboards and 
 | `capture.js` | Playwright script that visits each URL in `sites.json` and saves a PNG screenshot |
 | `sites.json` | List of sites to capture with per-site configuration (URL, selector, wait time, etc.) |
 | `index.html` | Static single-page dashboard that displays all screenshots with a lightbox viewer |
-| `create_pdf.py` | Builds a lossless captioned PDF from the captured screenshots |
-| `.github/workflows/capture.yml` | GitHub Actions workflow — runs on a daily schedule and pushes updated screenshots |
+| `.github/workflows/capture.yml` | GitHub Actions workflow — captures, commits, and deploys updated screenshots daily |
 
 ## Setup
 
 ### Prerequisites
 
 - Node.js ≥ 20
-- Python 3
-- Google Drive credentials (for automatic upload — see workflow secrets)
 
 ### Install dependencies
 
 ```bash
 npm ci
 npx playwright install --with-deps chromium
-python3 -m pip install img2pdf pillow
 ```
 
 ### Run a capture manually
 
 ```bash
-node capture.js        # captures all screenshots into screenshots/
-python3 create_pdf.py  # builds screenshots/screenshots.pdf
+node capture.js  # captures all screenshots into screenshots/
 ```
 
 ### View the dashboard
 
-Open `index.html` in a browser after screenshots have been captured.
+Open `index.html` in a browser after screenshots have been captured, or visit the public dashboard at:
 
-## GitHub Actions Secrets
+https://achsit.github.io/MarketDashboard/
 
-The workflow uploads the PDF and screenshots to Google Drive. Configure the following repository secrets:
+The scheduled workflow runs every day at 06:30 in UTC+8 (22:30 UTC). Each run commits the refreshed PNG snapshots to `screenshots/` and deploys the dashboard through GitHub Pages.
 
-| Secret | Description |
-|--------|-------------|
-| `GDRIVE_CLIENT_ID` | OAuth 2.0 client ID |
-| `GDRIVE_CLIENT_SECRET` | OAuth 2.0 client secret |
-| `GDRIVE_REFRESH_TOKEN` | OAuth 2.0 refresh token |
-| `GDRIVE_FOLDER_ID` | Target Google Drive folder ID |
+The Stockbee snapshot targets this iframe specifically:
+
+```html
+<iframe frameborder="0" height="1200" src="https://docs.google.com/spreadsheet/pub?key=0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c&amp;output=html&amp;widget=true" width="760"></iframe>
+```

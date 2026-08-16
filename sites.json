@@ -29,14 +29,14 @@
   },
   {
     "name": "Heat Map - Daily",
-    "url": "https://finviz.com/map?t=sec_all",
+    "url": "https://finviz.com/map?colorscale=colorblind",
     "file": "heatmap_d.png",
     "waitAfterLoadMs": 5000,
     "selector": "canvas"
   },
   {
     "name": "Heat Map - Weekly",
-    "url": "https://finviz.com/map?t=sec_all&st=w1",
+    "url": "https://finviz.com/map?st=w1&colorscale=colorblind",
     "file": "heatmap_w.png",
     "waitAfterLoadMs": 5000,
     "selector": "canvas"
@@ -89,7 +89,8 @@
     "url": "https://stockbee.blogspot.com/p/mm.html",
     "file": "stockbee-mm.png",
     "waitAfterLoadMs": 15000,
-    "selector": "iframe"
+    "selector": "iframe[src*='0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c']",
+    "waitForFrame": true
   },
   {
     "name": "Trading Economics Calendar",

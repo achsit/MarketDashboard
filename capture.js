@@ -174,6 +174,15 @@ async function handleDefault(page, site, targetFile) {
   if (site.selector) {
     const element = page.locator(site.selector).first();
     await element.waitFor({ state: 'visible', timeout: 15000 });
+
+    if (site.waitForFrame) {
+      const frame = await element.contentFrame();
+      if (!frame) {
+        throw new Error(`Could not access iframe for ${site.name}`);
+      }
+      await frame.waitForLoadState('domcontentloaded', { timeout: 30000 });
+    }
+
     await element.screenshot({ path: targetFile });
     console.log(`Saved selector screenshot: ${site.file}`);
     return;
