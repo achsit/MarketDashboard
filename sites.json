@@ -1,0 +1,101 @@
+[
+  {
+    "name": "SPY",
+    "url": "https://www.tradingview.com/x/ajV6Dgvm/",
+    "file": "spy.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/a/ajV6Dgvm.png",
+    "waitAfterLoadMs": 5000
+  },
+  {
+    "name": "QQQ",
+    "url": "https://www.tradingview.com/x/tQfEerK0/",
+    "file": "qqq.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/t/tQfEerK0.png",
+    "waitAfterLoadMs": 5000
+  },
+  {
+    "name": "DIA",
+    "url": "https://www.tradingview.com/x/IBjwCyO3/",
+    "file": "dia.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/i/IBjwCyO3.png",
+    "waitAfterLoadMs": 5000
+  },
+  {
+    "name": "IWM",
+    "url": "https://www.tradingview.com/x/P9lJDhrX/",
+    "file": "iwm.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/p/P9lJDhrX.png",
+    "waitAfterLoadMs": 5000
+  },
+  {
+    "name": "Heat Map - Daily",
+    "url": "https://finviz.com/map?t=sec_all",
+    "file": "heatmap_d.png",
+    "waitAfterLoadMs": 5000,
+    "selector": "canvas"
+  },
+  {
+    "name": "Heat Map - Weekly",
+    "url": "https://finviz.com/map?t=sec_all&st=w1",
+    "file": "heatmap_w.png",
+    "waitAfterLoadMs": 5000,
+    "selector": "canvas"
+  },
+  {
+    "name": "CNN Fear and Greed",
+    "url": "https://edition.cnn.com/markets/fear-and-greed",
+    "file": "fear-greed.png",
+    "waitAfterLoadMs": 5000,
+    "selector": "div.market-tabbed-container"
+  },
+  {
+    "name": "AAII Sentiment Survey",
+    "url": "https://www.a1trading.com/free-data-dashboards/aaii-sentiment-survey/",
+    "file": "aaii.png",
+    "waitAfterLoadMs": 25000,
+    "scrollY": 200,
+    "selector": "iframe.responsive-iframe"
+  },
+  {
+    "name": "NAAIM Exposure Index",
+    "url": "https://stockcharts.com/sc3/ui/?s=%21NAAIM&id=p26777962202",
+    "file": "naaim.png",
+    "waitAfterLoadMs": 7000,
+    "selector": "#chart-image"
+  },
+  {
+    "name": "EQWL",
+    "url": "https://www.tradingview.com/x/cCp1MObH/",
+    "file": "eqwl.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/c/cCp1MObH.png",
+    "waitAfterLoadMs": 5000
+  },
+  {
+    "name": "StockCharts USHL",
+    "url": "https://stockcharts.com/sc3/ui/?s=%24USHL&id=p77545961209",
+    "file": "ushl.png",
+    "waitAfterLoadMs": 7000,
+    "selector": "#chart-image"
+  },
+  {
+    "name": "SP500 Percent Above 50/200 MA",
+    "url": "https://stockcharts.com/sc3/ui/?s=%24SPX&id=p67949611453",
+    "file": "abv50200_SP500.png",
+    "waitAfterLoadMs": 7000,
+    "selector": "#chart-image"
+  },
+  {
+    "name": "Stockbee Market Monitor",
+    "url": "https://stockbee.blogspot.com/p/mm.html",
+    "file": "stockbee-mm.png",
+    "waitAfterLoadMs": 15000,
+    "selector": "iframe"
+  },
+  {
+    "name": "Trading Economics Calendar",
+    "url": "https://tradingeconomics.com/calendar",
+    "file": "economic-calendar.png",
+    "waitAfterLoadMs": 10000,
+    "selector": "table.table"
+  }
+]

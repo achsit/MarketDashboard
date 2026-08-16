@@ -1,0 +1,12 @@
+{
+  "name": "market-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated website screenshot dashboard using Playwright",
+  "scripts": {
+    "capture": "node capture.js"
+  },
+  "dependencies": {
+    "playwright": "^1.54.2"
+  }
+}

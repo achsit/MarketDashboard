@@ -1,0 +1,4 @@
+node_modules/
+screenshots/_captioned/
+screenshots/screenshots.pdf
+*.pdf

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #121a2b;
+      --panel-2: #182235;
+      --border: rgba(255,255,255,.09);
+      --text: #e8eefc;
+      --muted: #9cafc9;
+      --accent: #7dd3fc;
+      --shadow: 0 18px 40px rgba(0,0,0,.28);
+      --radius: 18px;
+      --gap: 18px;
+      --max: 1480px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(34,211,238,.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(59,130,246,.12), transparent 22%),
+        linear-gradient(180deg, #0a1120 0%, #0b1220 100%);
+    }
+    button, a { color: inherit; font: inherit; }
+    .wrap {
+      width: min(calc(100% - 28px), var(--max));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+    .hero {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(10,17,32,.92), rgba(10,17,32,.72));
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+	.hero-inner {
+	  width: min(calc(100% - 28px), var(--max));
+	  margin: 0 auto;
+	  padding: 18px 0 14px;
+	  overflow: hidden;
+	  transition: padding .24s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	.hero-top {
+	  max-height: 160px;
+	  opacity: 1;
+	  overflow: hidden;
+	  transition:
+		max-height .24s cubic-bezier(0.16, 1, 0.3, 1),
+		opacity .18s ease,
+		margin .24s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.hero.is-collapsed .hero-top {
+	  max-height: 0;
+	  opacity: 0;
+	  margin: 0;
+	  pointer-events: none;
+	}
+	.hero.is-collapsed .hero-inner {
+	  padding: 6px 0;
+	}
+
+	.hero.is-collapsed .toc {
+	  margin-top: 0;
+	}
+	.hero {
+	  transition: background .2s ease, box-shadow .2s ease;
+	}
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 1.15rem + 1.8vw, 2.6rem);
+      line-height: 1.05;
+      letter-spacing: -.03em;
+    }
+    .sub {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .98rem;
+      max-width: 74ch;
+    }
+	.toc {
+	  display: flex;
+	  gap: 10px;
+	  flex-wrap: wrap;
+	  margin-top: 14px;
+	  transition: margin-top .24s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+    .toc a {
+      padding: 6px 12px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 999px;
+      font-size: .88rem;
+      color: #dce7fb;
+      text-decoration: none;
+    }
+    section {
+      margin-top: 28px;
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(18,26,43,.92), rgba(18,26,43,.78));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(1.05rem, .95rem + .8vw, 1.5rem);
+      letter-spacing: -.02em;
+    }
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+    .grid {
+      display: grid;
+      gap: var(--gap);
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: start;
+    }
+    .card {
+      grid-column: span 12;
+      padding: 0;
+      text-align: left;
+      background: linear-gradient(180deg, rgba(24,34,53,.9), rgba(17,24,39,.94));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
+      cursor: zoom-in;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(125,211,252,.32);
+      box-shadow: 0 16px 34px rgba(0,0,0,.26);
+    }
+    .thumb {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #0f172a;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      padding: 12px 14px 14px;
+    }
+    .title {
+      font-size: .96rem;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -.01em;
+    }
+    .caption {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+    .dim {
+      color: var(--muted);
+      font-size: .78rem;
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+    .w-12 { grid-column: span 12; }
+    .w-8 { grid-column: span 12; }
+    .w-6 { grid-column: span 12; }
+    .w-4 { grid-column: span 12; }
+    .w-3 { grid-column: span 12; }
+    @media (min-width: 700px) {
+      .w-8 { grid-column: span 8; }
+      .w-6 { grid-column: span 6; }
+      .w-4 { grid-column: span 6; }
+      .w-3 { grid-column: span 4; }
+    }
+    @media (min-width: 1100px) {
+      .w-4 { grid-column: span 4; }
+      .w-3 { grid-column: span 3; }
+    }
+	@media (min-width: 700px) {
+	  #sentiment .grid {
+		grid-template-columns: 1fr 1.3fr;
+		grid-template-areas:
+		  "fear aaii"
+		  "naaim aaii";
+		align-items: stretch;
+	  }
+
+	  #sentiment .card-fear {
+		grid-area: fear;
+	  }
+
+	  #sentiment .card-naaim {
+		grid-area: naaim;
+	  }
+
+	  #sentiment .card-aaii {
+		grid-area: aaii;
+	  }
+
+	  #sentiment .card-aaii .thumb {
+		width: 100%;
+		height: auto;
+	  }
+	}
+	@media (min-width: 700px) {
+	  #breadth .grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-areas:
+		  "ushl spx"
+		  "ushl compq"
+		  "nya indu";
+		gap: var(--gap);
+		align-items: stretch;
+	  }
+
+	  #breadth .card-ushl { grid-area: ushl !important; }
+	  #breadth .card-spx { grid-area: spx !important; }
+	  #breadth .card-compq { grid-area: compq !important; }
+	  #breadth .card-nya { grid-area: nya !important; }
+	  #breadth .card-indu { grid-area: indu !important; }
+	}
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(3, 7, 18, .82);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-panel {
+      width: min(96vw, 1500px);
+      max-height: 92vh;
+      background: linear-gradient(180deg, rgba(16,23,36,.98), rgba(12,18,29,.98));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,.45);
+    }
+    .lightbox-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .lightbox-title {
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+    .lightbox-sub {
+      color: var(--muted);
+      font-size: .84rem;
+      margin-top: 3px;
+    }
+    .lightbox-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .lightbox-actions a,
+    .lightbox-actions button {
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 13px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .lightbox-body {
+      padding: 12px;
+      overflow: auto;
+      max-height: calc(92vh - 78px);
+      background: #0b1220;
+    }
+    .lightbox-body img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #0f172a;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+
+	<header class="hero" id="hero">
+	  <div class="hero-inner">
+		<div class="hero-top" id="heroTop">
+		  <h1>Market Dashboard</h1>
+		  <div class="sub">A single-page visual briefing arranged from price action to sentiment, breadth, market health, and upcoming macro events. First click enlarges a chart, then use the source button in the viewer to open its landing page.</div>
+		</div>
+		<nav class="toc">
+		  <a href="#performance">1. Market Performance</a>
+		  <a href="#sentiment">2. Market Sentiment</a>
+		  <a href="#breadth">3. Market Breadth</a>
+		  <a href="#monitor">4. Market Monitor</a>
+		  <a href="#calendar">5. Economic Calendar</a>
+		</nav>
+	  </div>
+	</header>
+  <main class="wrap">
+    <section id="performance">
+      <div class="section-head"><div><h2>1. Market Performance</h2><p>Broad tape view through the major ETFs, then daily and weekly participation via the heat maps.</p></div></div>
+      <div class="grid">
+        <button class="card w-3 js-open" data-title="SPY" data-dim="S&P 500 ETF daily view" data-img="screenshots/spy.png" data-link="https://www.tradingview.com/x/ajV6Dgvm/">
+          <img class="thumb" src="screenshots/spy.png" alt="SPY chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">SPY</div><div class="caption">S&P 500 ETF daily view</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-3 js-open" data-title="QQQ" data-dim="Nasdaq-100 ETF daily view" data-img="screenshots/qqq.png" data-link="https://www.tradingview.com/x/tQfEerK0/">
+          <img class="thumb" src="screenshots/qqq.png" alt="QQQ chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">QQQ</div><div class="caption">Nasdaq-100 ETF daily view</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-3 js-open" data-title="DIA" data-dim="Dow Jones ETF daily view" data-img="screenshots/dia.png" data-link="https://www.tradingview.com/x/IBjwCyO3/">
+          <img class="thumb" src="screenshots/dia.png" alt="DIA chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">DIA</div><div class="caption">Dow Jones ETF daily view</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-3 js-open" data-title="IWM" data-dim="Russell 2000 ETF daily view" data-img="screenshots/iwm.png" data-link="https://www.tradingview.com/x/P9lJDhrX/">
+          <img class="thumb" src="screenshots/iwm.png" alt="IWM chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">IWM</div><div class="caption">Russell 2000 ETF daily view</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-6 js-open" data-title="Heatmap (D)" data-dim="Daily Change Sector & Industry Heatmap" data-img="screenshots/heatmap_d.png" data-link="https://finviz.com/map?t=sec_all">
+          <img class="thumb" src="screenshots/heatmap_d.png" alt="Finviz daily heat map" width="1552" height="862">
+          <div class="meta"><div><div class="title">Heatmap (D)</div><div class="caption">Daily Change Sector & Industry Heatmap</div></div><div class="dim">Finviz</div></div>
+        </button>
+        <button class="card w-6 js-open" data-title="Heatmap (W)" data-dim="Weekly Change Sector & Industry Heatmap" data-img="screenshots/heatmap_w.png" data-link="https://finviz.com/map?t=sec_all&st=w1">
+          <img class="thumb" src="screenshots/heatmap_w.png" alt="Finviz weekly heat map" width="1552" height="862">
+          <div class="meta"><div><div class="title">Heatmap (W)</div><div class="caption">Weekly Change Sector & Industry Heatmap</div></div><div class="dim">Finviz</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="sentiment">
+      <div class="section-head"><div><h2>2. Market Sentiment</h2><p>Sentiment sits after price so the page reads as action first, psychology second.</p></div></div>
+      <div class="grid">
+        <button class="card js-open card-fear" data-title="Fear & Greed Index" data-dim="Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect" data-img="screenshots/fear-greed.png" data-link="https://edition.cnn.com/markets/fear-and-greed">
+          <img class="thumb" src="screenshots/fear-greed.png" alt="Fear and Greed index" width="1026" height="427">
+          <div class="meta"><div><div class="title">Fear & Greed Index</div><div class="caption">Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect</div></div><div class="dim">CNN</div></div>
+        </button>
+        <button class="card js-open card-aaii" data-title="AAII Investor Sentiment" data-dim="Opinions of individual investors on where the market is heading in the next six months" data-img="screenshots/aaii.png" data-link="https://www.a1trading.com/free-data-dashboards/aaii-sentiment-survey/">
+          <img class="thumb" src="screenshots/aaii.png" alt="AAII sentiment survey" width="1000" height="876">
+          <div class="meta"><div><div class="title">AAII Investor Sentiment</div><div class="caption">Opinions of individual investors on where the market is heading in the next six months</div></div><div class="dim">A1Trading</div></div>
+        </button>
+        <button class="card js-open card-naaim" data-title="NAAIM Exposure Index" data-dim="Actual adjustments active risk managers have made to client accounts over the past two weeks" data-img="screenshots/naaim.png" data-link="https://stockcharts.com/sc3/ui/?s=%21NAAIM&id=p26777962202">
+          <img class="thumb" src="screenshots/naaim.png" alt="NAAIM exposure index" width="990" height="664">
+          <div class="meta"><div><div class="title">NAAIM Exposure Index</div><div class="caption">Actual adjustments active risk managers have made to client accounts over the past two weeks</div></div><div class="dim">NAAIM</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="breadth">
+      <div class="section-head"><div><h2>3. Market Breadth</h2><p>Headline participation and index-level internals.</p></div></div>
+      <div class="grid">
+        <button class="card w-6 js-open" data-title="EQWL" data-dim="Equal-weight S&P 500 participation proxy" data-img="screenshots/eqwl.png" data-link="https://www.tradingview.com/x/cCp1MObH/">
+          <img class="thumb" src="screenshots/eqwl.png" alt="EQWL chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">EQWL</div><div class="caption">Equal-weight S&P 500 participation proxy</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-6 js-open" data-title="US New Highs-New Lows Index & Advance-Decline Line" data-dim="Positive net new highs show broad market strength and a healthy bull market" data-img="screenshots/ushl.png" data-link="https://stockcharts.com/sc3/ui/?s=%24USHL&id=p77545961209">
+          <img class="thumb" src="screenshots/ushl.png" alt="US high-low breadth chart" width="900" height="811">
+          <div class="meta"><div><div class="title">US New Highs-New Lows</div><div class="caption">Positive net new highs show broad market strength</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+        <button class="card w-12 js-open" data-title="SPX Percent of Stocks Above 50/200 MA" data-dim="Short-term overbought/oversold read and primary macro regime" data-img="screenshots/abv50200_SP500.png" data-link="https://stockcharts.com/sc3/ui/?s=%24SPX&id=p67949611453">
+          <img class="thumb" src="screenshots/abv50200_SP500.png" alt="S&P 500 above 50 and 200 day average" width="990" height="817">
+          <div class="meta"><div><div class="title">SPX % Above 50/200 MA</div><div class="caption">Short-term overbought/oversold read and primary macro regime</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="monitor">
+      <div class="section-head"><div><h2>4. Market Monitor</h2><p>Stockbee market-health checklist for tracking regime and breadth conditions.</p></div></div>
+      <div class="grid">
+        <button class="card w-12 js-open" data-title="Stockbee Market Monitor" data-dim="Daily market-health checklist" data-img="screenshots/stockbee-mm.png" data-link="https://stockbee.blogspot.com/p/mm.html">
+          <img class="thumb" src="screenshots/stockbee-mm.png" alt="Stockbee market monitor" width="1200" height="800">
+          <div class="meta"><div><div class="title">Stockbee Market Monitor</div><div class="caption">Daily market-health checklist</div></div><div class="dim">Stockbee</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="calendar">
+      <div class="section-head"><div><h2>5. Economic Calendar</h2><p>Upcoming macro releases and central-bank events.</p></div></div>
+      <div class="grid">
+        <button class="card w-12 js-open" data-title="Trading Economics Calendar" data-dim="Major US and global economic events" data-img="screenshots/economic-calendar.png" data-link="https://tradingeconomics.com/calendar">
+          <img class="thumb" src="screenshots/economic-calendar.png" alt="Economic calendar" width="1200" height="900">
+          <div class="meta"><div><div class="title">Trading Economics Calendar</div><div class="caption">Major US and global economic events</div></div><div class="dim">Trading Economics</div></div>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lightbox-panel">
+      <div class="lightbox-top">
+        <div>
+          <div class="lightbox-title" id="lightboxTitle">Image</div>
+          <div class="lightbox-sub" id="lightboxSub">Dimensions</div>
+        </div>
+        <div class="lightbox-actions">
+          <a id="lightboxLink" href="#" target="_blank" rel="noopener noreferrer">Open source site</a>
+          <button type="button" id="lightboxClose">Close</button>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <img id="lightboxImg" src="" alt="Expanded dashboard image">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxSub = document.getElementById('lightboxSub');
+    const lightboxLink = document.getElementById('lightboxLink');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    document.querySelectorAll('.js-open').forEach(card => {
+      card.addEventListener('click', () => {
+        lightboxImg.src = card.dataset.img;
+        lightboxTitle.textContent = card.dataset.title;
+        lightboxSub.textContent = card.dataset.dim;
+        lightboxLink.href = card.dataset.link;
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+      });
+    });
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      lightbox.setAttribute('aria-hidden', 'true');
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+    });
+	
+	const hero = document.getElementById('hero');
+
+	const HERO_COLLAPSE_Y = 220;
+	const HERO_EXPAND_Y = 70;
+
+	let heroPinnedOpen = false;
+	let heroCollapsed = false;
+	let ticking = false;
+
+	function applyHeroState() {
+	  hero.classList.toggle('is-collapsed', heroCollapsed && !heroPinnedOpen);
+	}
+
+	function updateHeroState() {
+	  const y = window.scrollY;
+
+	  if (!heroPinnedOpen) {
+		if (!heroCollapsed && y >= HERO_COLLAPSE_Y) {
+		  heroCollapsed = true;
+		} else if (heroCollapsed && y <= HERO_EXPAND_Y) {
+		  heroCollapsed = false;
+		}
+	  }
+	  applyHeroState();
+	  ticking = false;
+	}
+
+	window.addEventListener('scroll', () => {
+	  if (!ticking) {
+		ticking = true;
+		requestAnimationFrame(updateHeroState);
+	  }
+	}, { passive: true });
+
+	hero.addEventListener('mouseenter', () => {
+	  if (heroCollapsed) {
+		heroPinnedOpen = true;
+		applyHeroState();
+	  }
+	});
+
+	hero.addEventListener('mouseleave', () => {
+	  heroPinnedOpen = false;
+	  applyHeroState();
+	});
+
+	updateHeroState();
+  </script>
+</body>
+</html>
+
