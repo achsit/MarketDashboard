@@ -37,39 +37,6 @@ async function dismissCommonPopups(page) {
   }
 }
 
-async function handleCME(page, site, targetFile) {
-  await page.evaluate((y) => window.scrollBy(0, y), site.preClickScrollY || 400);
-  await sleep(1500);
-
-  const fedwatchFrame = page.frameLocator('iframe[src*="IntegratedFedWatchTool"]');
-  await sleep(5000);
-
-  try {
-    const probTab = fedwatchFrame.locator('#ctl00_MainContent_ucViewControl_IntegratedFedWatchTool_lbPTree');
-    await probTab.waitFor({ state: 'visible', timeout: 15000 });
-    await probTab.click();
-    console.log('Clicked Probabilities inside FedWatch frame by id');
-    await sleep(4000);
-  } catch (e) {
-    console.log('Probabilities tab click inside frame failed:', e.message);
-  }
-
-  const tableElement = fedwatchFrame
-    .locator('table.grid-thm.grid-thm-v2')
-    .filter({
-      has: fedwatchFrame.locator('text=CME FedWatch Tool - Conditional Meeting Probabilities')
-    })
-    .first();
-
-  await tableElement.waitFor({ state: 'visible', timeout: 15000 });
-
-  await tableElement.screenshot({
-    path: targetFile
-  });
-
-  console.log(`Saved probabilities table-only screenshot: ${site.file}`);
-}
-
 async function handleYahooEarnings(page, site, targetFile) {
   await page.setViewportSize({ width: 2000, height: 1600 });
   await sleep(1000);
@@ -179,7 +146,26 @@ async function handleFearGreed(page, site, targetFile) {
   console.log(`Saved Fear and Greed screenshot: ${site.file}`);
 }
 
+async function fetchSnapshot(site, targetFile) {
+  const res = await fetch(site.snapshot, {
+    headers: { "User-Agent": "Mozilla/5.0" }
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const buffer = Buffer.from(await res.arrayBuffer());
+  fs.writeFileSync(targetFile, buffer);
+  console.log(`Saved snapshot image: ${site.file}`);
+}
+
 async function handleDefault(page, site, targetFile) {
+  if (site.snapshot) {
+    try {
+      await fetchSnapshot(site, targetFile);
+      return;
+    } catch (err) {
+      console.log(`Snapshot fetch failed for ${site.name}: ${err.message}; falling back to screenshot`);
+    }
+  }
+
   if (site.scrollY) {
     await page.mouse.wheel(0, site.scrollY);
     await sleep(1500);
@@ -224,9 +210,7 @@ async function runCapture(page, site, targetFile) {
   await sleep(site.waitAfterLoadMs || 5000);
   await dismissCommonPopups(page);
 
-  if (site.name === 'CME FedWatch Tool') {
-    await handleCME(page, site, targetFile);
-  } else if (site.name === 'Yahoo Earnings Calendar') {
+  if (site.name === 'Yahoo Earnings Calendar') {
     await handleYahooEarnings(page, site, targetFile);
   } else if (site.name === 'CNN Fear and Greed') {
     await sleep(2000);

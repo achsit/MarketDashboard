@@ -1,6 +1,6 @@
 # MarketDashboard
 
-Daily Market Dashboards with Snapshots — a single-page visual briefing arranged from price action to sentiment, breadth, exits, macro structure, and upcoming events.
+Daily Market Dashboards with Snapshots — a single-page visual briefing arranged from price action to sentiment, breadth, market health, and upcoming macro events.
 
 ## Overview
 
@@ -8,12 +8,11 @@ This project automatically captures screenshots of key financial dashboards and 
 
 ### Dashboard Sections
 
-1. **Market Performance** — Finviz index performance and daily/weekly sector heat maps
+1. **Market Performance** — SPY, QQQ, DIA, and IWM daily views from TradingView, plus Finviz daily/weekly sector heat maps
 2. **Market Sentiment** — CNN Fear & Greed Index, AAII Investor Sentiment Survey, NAAIM Exposure Index
-3. **Market Breadth** — US New Highs–Lows & Advance–Decline, percent of stocks above 50/200-day MA across SPX, COMPQ, NYA, INDU
-4. **Exit Indicators** — VIX and High Yield Option-Adjusted Spread
-5. **Economic Indicators** — CME FedWatch conditional probabilities, T10Y3M yield-curve spread, Dynamic Yield Curve
-6. **Important Events** — Earnings calendar, Implied Earnings Moves, Economic calendar
+3. **Market Breadth** — EQWL equal-weight proxy, US New Highs–Lows, and SPX percent above 50/200-day MA
+4. **Market Monitor** — Stockbee market-health checklist
+5. **Economic Calendar** — Trading Economics upcoming macro releases and central-bank events
 
 ## How It Works
 

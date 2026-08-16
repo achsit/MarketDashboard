@@ -241,34 +241,6 @@
 	  #breadth .card-nya { grid-area: nya !important; }
 	  #breadth .card-indu { grid-area: indu !important; }
 	}
-	@media (min-width: 700px) {
-	  #events .grid {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		grid-template-areas:
-		  "earnings economic"
-		  "spotgamma economic";
-		gap: var(--gap);
-		align-items: stretch;
-	  }
-
-	  #events .card-earnings  { grid-area: earnings; }
-	  #events .card-economic  { grid-area: economic; }
-	  #events .card-spotgamma { grid-area: spotgamma; }
-
-	  #events .card-earnings,
-	  #events .card-economic,
-	  #events .card-spotgamma {
-		width: 100%;
-		height: 100%;
-	  }
-
-	  /* Optional: make SpotGamma chart fill its card more */
-	  #events .card-spotgamma .thumb {
-		width: 100%;
-		height: auto;
-	  }
-	}
     .lightbox {
       position: fixed;
       inset: 0;
@@ -344,25 +316,36 @@
 	  <div class="hero-inner">
 		<div class="hero-top" id="heroTop">
 		  <h1>Market Dashboard</h1>
-		  <div class="sub">A single-page visual briefing arranged from price action to sentiment, breadth, exits, macro structure, and upcoming events. First click enlarges a chart, then use the source button in the viewer to open its landing page.</div>
+		  <div class="sub">A single-page visual briefing arranged from price action to sentiment, breadth, market health, and upcoming macro events. First click enlarges a chart, then use the source button in the viewer to open its landing page.</div>
 		</div>
 		<nav class="toc">
 		  <a href="#performance">1. Market Performance</a>
 		  <a href="#sentiment">2. Market Sentiment</a>
 		  <a href="#breadth">3. Market Breadth</a>
-		  <a href="#exit">4. Exit Indicators</a>
-		  <a href="#economic">5. Economic Indicators</a>
-		  <a href="#events">6. Important Events</a>
+		  <a href="#monitor">4. Market Monitor</a>
+		  <a href="#calendar">5. Economic Calendar</a>
 		</nav>
 	  </div>
 	</header>
   <main class="wrap">
     <section id="performance">
-      <div class="section-head"><div><h2>1. Market Performance</h2><p>Start with the broad tape, then compare daily and weekly participation through the heat maps.</p></div></div>
+      <div class="section-head"><div><h2>1. Market Performance</h2><p>Broad tape view through the major ETFs, then daily and weekly participation via the heat maps.</p></div></div>
       <div class="grid">
-        <button class="card w-12 js-open" data-title="Index Performance" data-dim="Previous Trading Day Intraday Chart" data-img="screenshots/finviz.png" data-link="https://finviz.com/">
-          <img class="thumb" src="screenshots/finviz.png" alt="Finviz market indexes" width="1426" height="205">
-          <div class="meta"><div><div class="title">Index Performance</div><div class="caption">Previous Trading Day Intraday Chart</div></div><div class="dim">Finviz</div></div>
+        <button class="card w-3 js-open" data-title="SPY" data-dim="S&P 500 ETF daily view" data-img="screenshots/spy.png" data-link="https://www.tradingview.com/x/ajV6Dgvm/">
+          <img class="thumb" src="screenshots/spy.png" alt="SPY chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">SPY</div><div class="caption">S&P 500 ETF daily view</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-3 js-open" data-title="QQQ" data-dim="Nasdaq-100 ETF daily view" data-img="screenshots/qqq.png" data-link="https://www.tradingview.com/x/tQfEerK0/">
+          <img class="thumb" src="screenshots/qqq.png" alt="QQQ chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">QQQ</div><div class="caption">Nasdaq-100 ETF daily view</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-3 js-open" data-title="DIA" data-dim="Dow Jones ETF daily view" data-img="screenshots/dia.png" data-link="https://www.tradingview.com/x/IBjwCyO3/">
+          <img class="thumb" src="screenshots/dia.png" alt="DIA chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">DIA</div><div class="caption">Dow Jones ETF daily view</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-3 js-open" data-title="IWM" data-dim="Russell 2000 ETF daily view" data-img="screenshots/iwm.png" data-link="https://www.tradingview.com/x/P9lJDhrX/">
+          <img class="thumb" src="screenshots/iwm.png" alt="IWM chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">IWM</div><div class="caption">Russell 2000 ETF daily view</div></div><div class="dim">TradingView</div></div>
         </button>
         <button class="card w-6 js-open" data-title="Heatmap (D)" data-dim="Daily Change Sector & Industry Heatmap" data-img="screenshots/heatmap_d.png" data-link="https://finviz.com/map?t=sec_all">
           <img class="thumb" src="screenshots/heatmap_d.png" alt="Finviz daily heat map" width="1552" height="862">
@@ -394,80 +377,42 @@
     </section>
 
     <section id="breadth">
-      <div class="section-head"><div><h2>3. Market Breadth</h2><p>The breadth block starts with the headline participation chart, then compares index-level participation beneath it.</p></div></div>
+      <div class="section-head"><div><h2>3. Market Breadth</h2><p>Headline participation and index-level internals.</p></div></div>
       <div class="grid">
-        <button class="card js-open card-ushl" data-title="US New Highs-New Lows Index & Advance-Decline Line" data-dim="Positive net new highs show broad market strength and a healthy bull market; A rising NYAD confirms that a market rally is backed by widespread stock participation" data-img="screenshots/ushl.png" data-link="https://stockcharts.com/sc3/ui/?s=%24USHL&id=p77545961209">
+        <button class="card w-6 js-open" data-title="EQWL" data-dim="Equal-weight S&P 500 participation proxy" data-img="screenshots/eqwl.png" data-link="https://www.tradingview.com/x/cCp1MObH/">
+          <img class="thumb" src="screenshots/eqwl.png" alt="EQWL chart" width="1200" height="628">
+          <div class="meta"><div><div class="title">EQWL</div><div class="caption">Equal-weight S&P 500 participation proxy</div></div><div class="dim">TradingView</div></div>
+        </button>
+        <button class="card w-6 js-open" data-title="US New Highs-New Lows Index & Advance-Decline Line" data-dim="Positive net new highs show broad market strength and a healthy bull market" data-img="screenshots/ushl.png" data-link="https://stockcharts.com/sc3/ui/?s=%24USHL&id=p77545961209">
           <img class="thumb" src="screenshots/ushl.png" alt="US high-low breadth chart" width="900" height="811">
-          <div class="meta"><div><div class="title">US New Highs-New Lows Index & Advance-Decline Line</div><div class="caption">Positive net new highs show broad market strength and a healthy bull market; A rising NYAD confirms that a market rally is backed by widespread stock participation</div></div><div class="dim">Stockcharts</div></div>
+          <div class="meta"><div><div class="title">US New Highs-New Lows</div><div class="caption">Positive net new highs show broad market strength</div></div><div class="dim">Stockcharts</div></div>
         </button>
-        <button class="card js-open card-spx" data-title="SPX Percent of Stocks Above 50/200 MA" data-dim="Finding short-term overbought/oversold pullbacks & determining the primary macro market regime" data-img="screenshots/abv50200_SP500.png" data-link="https://stockcharts.com/sc3/ui/?s=%24SPX&id=p67949611453">
+        <button class="card w-12 js-open" data-title="SPX Percent of Stocks Above 50/200 MA" data-dim="Short-term overbought/oversold read and primary macro regime" data-img="screenshots/abv50200_SP500.png" data-link="https://stockcharts.com/sc3/ui/?s=%24SPX&id=p67949611453">
           <img class="thumb" src="screenshots/abv50200_SP500.png" alt="S&P 500 above 50 and 200 day average" width="990" height="817">
-          <div class="meta"><div><div class="title">SPX Percent of Stocks Above 50/200 MA</div><div class="caption">Finding short-term overbought/oversold pullbacks & determining the primary macro market regime</div></div><div class="dim">Stockcharts</div></div>
-        </button>
-        <button class="card js-open card-compq" data-title="COMPQ Percent of Stocks Above 50/200 MA" data-dim="Finding short-term overbought/oversold pullbacks & determining the primary macro market regime" data-img="screenshots/abv50200_COMPQ.png" data-link="https://stockcharts.com/sc3/ui/?s=%24COMPQ&id=p40105966136">
-          <img class="thumb" src="screenshots/abv50200_COMPQ.png" alt="NASDAQ above 50 and 200 day average" width="990" height="817">
-          <div class="meta"><div><div class="title">COMPQ Percent of Stocks Above 50/200 MA</div><div class="caption">Finding short-term overbought/oversold pullbacks & determining the primary macro market regime</div></div><div class="dim">Stockcharts</div></div>
-        </button>
-        <button class="card js-open card-nya" data-title="NYA Percent of Stocks Above 50/200 MA" data-dim="Finding short-term overbought/oversold pullbacks & determining the primary macro market regime" data-img="screenshots/abv50200_NYA.png" data-link="https://stockcharts.com/sc3/ui/?s=%24NYA&id=p88333577275">
-          <img class="thumb" src="screenshots/abv50200_NYA.png" alt="NYSE above 50 and 200 day average" width="990" height="817">
-          <div class="meta"><div><div class="title">NYA Percent of Stocks Above 50/200 MA</div><div class="caption">Finding short-term overbought/oversold pullbacks & determining the primary macro market regime</div></div><div class="dim">Stockcharts</div></div>
-        </button>
-        <button class="card js-open card-indu" data-title="INDU Percent of Stocks Above 50/200 MA" data-dim="Finding short-term overbought/oversold pullbacks & determining the primary macro market regime" data-img="screenshots/abv50200_INDU.png" data-link="https://stockcharts.com/sc3/ui/?s=%24INDU&id=p10788395394">
-          <img class="thumb" src="screenshots/abv50200_INDU.png" alt="Dow above 50 and 200 day average" width="990" height="817">
-          <div class="meta"><div><div class="title">INDU Percent of Stocks Above 50/200 MA</div><div class="caption">Finding short-term overbought/oversold pullbacks & determining the primary macro market regime</div></div><div class="dim">Stockcharts</div></div>
+          <div class="meta"><div><div class="title">SPX % Above 50/200 MA</div><div class="caption">Short-term overbought/oversold read and primary macro regime</div></div><div class="dim">Stockcharts</div></div>
         </button>
       </div>
     </section>
 
-    <section id="exit">
-      <div class="section-head"><div><h2>4. Exit Indicator</h2><p>These are paired as risk-off checks: implied volatility and credit stress.</p></div></div>
+    <section id="monitor">
+      <div class="section-head"><div><h2>4. Market Monitor</h2><p>Stockbee market-health checklist for tracking regime and breadth conditions.</p></div></div>
       <div class="grid">
-        <button class="card w-6 js-open" data-title="Volatility Index" data-dim="Values below 20 indicate a calm market, while values above 30 signal high investor anxiety, uncertainty, or market sell-offs" data-img="screenshots/vix.png" data-link="https://stockcharts.com/sc3/ui/?s=%24VIX&id=p41274960794">
-          <img class="thumb" src="screenshots/vix.png" alt="VIX chart" width="900" height="534">
-          <div class="meta"><div><div class="title">Volatility Index</div><div class="caption">Values below 20 indicate a calm market, while values above 30 signal high investor anxiety, uncertainty, or market sell-offs</div></div><div class="dim">Stockcharts</div></div>
-        </button>
-        <button class="card w-6 js-open" data-title="High Yield Index Option-Adjusted Spread" data-dim="Value below 4 signals a strong economy where investors are confident and willing to accept less premium for taking on default risk, while value above 5 signals extreme market stress, economic fear, or an impending recession as investors panic-sell corporate debt" data-img="screenshots/hyioas.png" data-link="https://stockcharts.com/sc3/ui/?s=%24%24HYIOAS&id=p33700603858">
-          <img class="thumb" src="screenshots/hyioas.png" alt="High yield option-adjusted spread" width="990" height="970">
-          <div class="meta"><div><div class="title">High Yield Index Option-Adjusted Spread</div><div class="caption">Value below 4 signals a strong economy where investors are confident and willing to accept less premium for taking on default risk, while value above 5 signals extreme market stress, economic fear, or an impending recession as investors panic-sell corporate debt</div></div><div class="dim">Stockcharts</div></div>
+        <button class="card w-12 js-open" data-title="Stockbee Market Monitor" data-dim="Daily market-health checklist" data-img="screenshots/stockbee-mm.png" data-link="https://stockbee.blogspot.com/p/mm.html">
+          <img class="thumb" src="screenshots/stockbee-mm.png" alt="Stockbee market monitor" width="1200" height="800">
+          <div class="meta"><div><div class="title">Stockbee Market Monitor</div><div class="caption">Daily market-health checklist</div></div><div class="dim">Stockbee</div></div>
         </button>
       </div>
     </section>
 
-    <section id="economic">
-      <div class="section-head"><div><h2>5. Economic Indicator</h2><p>Macro structure follows risk checks, moving from rate expectations to curve shape and term-spread recession signal.</p></div></div>
+    <section id="calendar">
+      <div class="section-head"><div><h2>5. Economic Calendar</h2><p>Upcoming macro releases and central-bank events.</p></div></div>
       <div class="grid">
-        <button class="card w-4 js-open" data-title="Conditional Meeting Probabilities" data-dim="Likelihood that the Fed will change the Federal target rate at upcoming FOMC meetings" data-img="screenshots/cme.png" data-link="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html">
-          <img class="thumb" src="screenshots/cme.png" alt="CME FedWatch" width="440" height="314">
-          <div class="meta"><div><div class="title">Conditional Meeting Probabilities</div><div class="caption">Likelihood that the Fed will change the Federal target rate at upcoming FOMC meetings</div></div><div class="dim">CME Group</div></div>
-        </button>
-        <button class="card w-4 js-open" data-title="10-Year Treasury Constant Maturity Minus 3-Month Treasury Constant Maturity" data-dim="Positve means investors expect the economy to grow and demand higher interest rates against inflation; Negative means extreme investor anxiety, investors believe economic trouble is brewing soon and rush to lock in long-term 10-year yields before the Federal Reserve is forced to slash interest rates to combat a recession" data-img="screenshots/t10y3m.png" data-link="https://fred.stlouisfed.org/series/T10Y3M">
-          <img class="thumb" src="screenshots/t10y3m.png" alt="10 year minus 3 month spread" width="1320" height="466">
-          <div class="meta"><div><div class="title">10-Year Treasury Constant Maturity Minus 3-Month Treasury Constant Maturity</div><div class="caption">Positve means investors expect the economy to grow and demand higher interest rates against inflation; Negative means extreme investor anxiety, investors believe economic trouble is brewing soon and rush to lock in long-term 10-year yields before the Federal Reserve is forced to slash interest rates to combat a recession</div></div><div class="dim">FRED</div></div>
-        </button>
-        <button class="card w-4 js-open" data-title="Dynamic Yield Curve" data-dim="Normally slopes up from left to right, implies healthy, expanding economy with normal inflation expecations; Flat implies economic transition or uncertainty; Inverted implies heavy fear of an impending recession" data-img="screenshots/yieldcurve.png" data-link="https://stockcharts.com/freecharts/yieldcurve.php">
-          <img class="thumb" src="screenshots/yieldcurve.png" alt="Yield curve chart" width="800" height="451">
-          <div class="meta"><div><div class="title">Dynamic Yield Curve</div><div class="caption">Normally slopes up from left to right, implies healthy, expanding economy with normal inflation expecations; Flat implies economic transition or uncertainty; Inverted implies heavy fear of an impending recession</div></div><div class="dim">Stockcharts</div></div>
+        <button class="card w-12 js-open" data-title="Trading Economics Calendar" data-dim="Major US and global economic events" data-img="screenshots/economic-calendar.png" data-link="https://tradingeconomics.com/calendar">
+          <img class="thumb" src="screenshots/economic-calendar.png" alt="Economic calendar" width="1200" height="900">
+          <div class="meta"><div><div class="title">Trading Economics Calendar</div><div class="caption">Major US and global economic events</div></div><div class="dim">Trading Economics</div></div>
         </button>
       </div>
     </section>
-
-	<section id="events">
-	  <div class="section-head"><div><h2>6. Important Events</h2><p>The page ends with the practical calendar layer: earnings first, then the longer economic slate.</p></div></div>
-	  <div class="grid">
-		<button class="card js-open card-earnings" data-title="Earnings Calendar" data-dim="For upcoming big names" data-img="screenshots/earnings-calendar.png" data-link="https://finance.yahoo.com/calendar/earnings/">
-		  <img class="thumb" src="screenshots/earnings-calendar.png" alt="Earnings calendar" width="1006" height="940">
-		  <div class="meta"><div><div class="title">Earnings Calendar</div><div class="caption">For upcoming big names</div></div><div class="dim">Yahoo! Finance</div></div>
-		</button>
-		<button class="card js-open card-spotgamma" data-title="Implied Earnings Moves Chart" data-dim="The estimated move is based off of the at-the-money straddle for the first expiration date after a stock’s scheduled earnings date" data-img="screenshots/spotgamma-earnings.png" data-link="https://spotgamma.com/free-tools/implied-earnings-moves/">
-		  <img class="thumb" src="screenshots/spotgamma-earnings.png" alt="Implied Earnings Moves Chart" width="800" height="536">
-		  <div class="meta"><div><div class="title">Implied Earnings Moves Chart</div><div class="caption">The estimated move is based off of the at-the-money straddle for the first expiration date after a stock’s scheduled earnings date</div></div><div class="dim">SpotGamma</div></div>
-		</button>
-		<button class="card js-open card-economic" data-title="Economic Calendar" data-dim="For upcoming major US events" data-img="screenshots/economic-calendar.png" data-link="https://finviz.com/calendar/economic?t=economic">
-		  <img class="thumb" src="screenshots/economic-calendar.png" alt="Economic calendar" width="595" height="1805">
-		  <div class="meta"><div><div class="title">Economic Calendar</div><div class="caption">For upcoming major US events</div></div><div class="dim">Finviz</div></div>
-		</button>
-	  </div>
-	</section>
   </main>
 
   <div class="lightbox" id="lightbox" aria-hidden="true">

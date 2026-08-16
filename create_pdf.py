@@ -32,25 +32,20 @@ OUTPUT_PDF = SCREENSHOTS_DIR / "screenshots.pdf"
 
 # --- EDIT THIS LIST: (filename, caption) in the exact order you want them in the PDF ---
 ORDERED_IMAGES = [
-    ("finviz.png", "1. Market Performance — intraday key indices performance in previous trading session (S&P 500, NASDAQ, DOW, RUSSELL 2000)"),
+    ("spy.png", "1. Market Performance — SPY (S&P 500 ETF) daily view"),
+    ("qqq.png", "1. Market Performance — QQQ (Nasdaq-100 ETF) daily view"),
+    ("dia.png", "1. Market Performance — DIA (Dow Jones ETF) daily view"),
+    ("iwm.png", "1. Market Performance — IWM (Russell 2000 ETF) daily view"),
     ("heatmap_d.png", "1. Market Performance — sectors and industries heatmap based on daily change data"),
     ("heatmap_w.png", "1. Market Performance — sectors and industries heatmap based on weekly change data"),
-    ("fear-greed.png", "2. Market Sentiment — Fear & Greed Index - latest value shows on the gauge on left part of the image, compare it with previous close/1 week ago/1 month ago/1 year ago values listed on the right part of the image"),
-    ("naaim.png", "2. Market Sentiment — NAAIM Exposure Index (Actual adjustments active risk managers have made to client accounts over the past two weeks)"),
-    ("aaii.png", "2. Market Sentiment — AAII Investor Sentiment Survey (Opinions of individual investors on where the market is heading in the next six months) - compare the latest week bullish (blue) and bearish (red) readings to that of the previous weeks to monitor the sentiment trend"),
-    ("ushl.png", "3. Market Breadth — $USHL (Positive net new highs show broad market strength and a healthy bull market) & $NYAD (A rising NYAD confirms that a market rally is backed by widespread stock participation) and their respective 10-Day Moving Average"),
-    ("abv50200_SP500.png", "3. Market Breadth — S&P500 Percent of Stocks Above 50 Day & 200 Day Moving Average and their respective 10-Day Moving Average"),
-    ("abv50200_COMPQ.png", "3. Market Breadth — COMPQ Percent of Stocks Above 50 Day & 200 Day Moving Average and their respective 10-Day Moving Average"),
-    ("abv50200_NYA.png", "3. Market Breadth — NYSE Percent of Stocks Above 50 Day & 200 Day Moving Average and their respective 10-Day Moving Average"),
-    ("abv50200_INDU.png", "3. Market Breadth — Dow Jones Industrials Percent of Stocks Above 50 Day & 200 Day Moving Average and their respective 10-Day Moving Average"),
-    ("vix.png", "4. Exit Indicator — $VIX (Values below 20 indicate a calm market, while values above 30 signal high investor anxiety, uncertainty, or market sell-offs)"),
-    ("hyioas.png", "4. Exit Indicator — US High Yield Index Option-Adjusted Spread (Value below 4 signals a strong economy where investors are confident and willing to accept less premium for taking on default risk, while value above 5 signals extreme market stress, economic fear, or an impending recession as investors panic-sell corporate debt)"),
-    ("cme.png", "5. Economic Indicator — Conidtional Meeting Probabilities (Likelihood that the Fed will change the Federal target rate at upcoming FOMC meetings)"),
-    ("t10y3m.png", "5. Economic Indicator — 10-Year Treasury Constant Maturity Minus 30Month Treasury Constant Maturity (Positve means investors expect the economy to grow and demand higher interest rates against inflation; Negative means extreme investor anxiety, investors believe economic trouble is brewing soon and rush to lock in long-term 10-year yields before the Federal Reserve is forced to slash interest rates to combat a recession)"),
-    ("yieldcurve.png", "5. Economic Indicator — Normally slopes up from left to right, implies healthy, expanding economy with normal inflation expecations; Flat implies economic transition or uncertainty; Inverted implies heavy fear of an impending recession"),
-    ("earnings-calendar.png", "6. Imortant Events — Earnings Calendar (For upcoming big names)"),
-    ("spotgamma-earnings.png", "6. Implied Earnings Moves Chart for Top Names — The estimated move is based off of the at-the-money straddle for the first expiration date after a stock's scheduled earnings date"),
-    ("economic-calendar.png", "6. Imortant Events — Economic Calendar (For upcoming major US events)")
+    ("fear-greed.png", "2. Market Sentiment — Fear & Greed Index: latest value on the gauge, compare with previous close/1 week/1 month/1 year ago readings"),
+    ("naaim.png", "2. Market Sentiment — NAAIM Exposure Index (actual adjustments active risk managers have made to client accounts over the past two weeks)"),
+    ("aaii.png", "2. Market Sentiment — AAII Investor Sentiment Survey (opinions of individual investors on where the market is heading in the next six months)"),
+    ("eqwl.png", "3. Market Breadth — EQWL equal-weight S&P 500 participation proxy"),
+    ("ushl.png", "3. Market Breadth — $USHL new highs-new lows and advance-decline breadth"),
+    ("abv50200_SP500.png", "3. Market Breadth — S&P 500 percent of stocks above 50-day and 200-day moving averages"),
+    ("stockbee-mm.png", "4. Market Monitor — Stockbee daily market-health checklist"),
+    ("economic-calendar.png", "5. Economic Calendar — Trading Economics upcoming macro releases and central-bank events")
     # Add more (filename, caption) pairs here as needed
 ]
 # ------------------------------------------------------------------------------------------
