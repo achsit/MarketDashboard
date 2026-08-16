@@ -89,7 +89,8 @@
     "url": "https://stockbee.blogspot.com/p/mm.html",
     "file": "stockbee-mm.png",
     "waitAfterLoadMs": 15000,
-    "selector": "iframe"
+    "selector": "iframe[src*='0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c']",
+    "waitForFrame": true
   },
   {
     "name": "Trading Economics Calendar",
