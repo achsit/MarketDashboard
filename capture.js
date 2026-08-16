@@ -176,11 +176,8 @@ async function handleDefault(page, site, targetFile) {
     await element.waitFor({ state: 'visible', timeout: 15000 });
 
     if (site.waitForFrame) {
-      const frame = await element.contentFrame();
-      if (!frame) {
-        throw new Error(`Could not access iframe for ${site.name}`);
-      }
-      await frame.waitForLoadState('domcontentloaded', { timeout: 30000 });
+      const frameBody = element.contentFrame().locator('body');
+      await frameBody.waitFor({ state: 'visible', timeout: 30000 });
     }
 
     await element.screenshot({ path: targetFile });
@@ -213,7 +210,7 @@ async function handleDefault(page, site, targetFile) {
 async function runCapture(page, site, targetFile) {
   await page.goto(site.url, {
     waitUntil: 'domcontentloaded',
-    timeout: 90000
+    timeout: site.navigationTimeoutMs || 90000
   });
 
   await sleep(site.waitAfterLoadMs || 5000);
@@ -248,6 +245,7 @@ async function captureSite(browser, site) {
     console.error(`First try failed: ${site.name} -> ${error.message}`);
 
     try {
+      await sleep(site.retryDelayMs || 3000);
       await runCapture(page, site, targetFile);
     } catch (retryError) {
       console.error(`Failed: ${site.name} -> ${retryError.message}`);

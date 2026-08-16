@@ -48,7 +48,9 @@ Open `index.html` in a browser after screenshots have been captured, or visit th
 
 https://achsit.github.io/MarketDashboard/
 
-The scheduled workflow runs every day at 06:30 in UTC+8 (22:30 UTC). Each run commits the refreshed PNG snapshots to `screenshots/` and deploys the dashboard through GitHub Pages.
+Before the first scheduled run, open the repository's **Settings > Pages** and set **Source** to **GitHub Actions**. The workflow has permission to enable Pages when possible, but repository or organization policies may still require an administrator to enable Pages.
+
+The scheduled workflow runs every day at 06:30 in UTC+8 (22:30 UTC). Each run commits the refreshed PNG snapshots to `screenshots/` and deploys the dashboard through GitHub Pages. If an external site is unavailable, its capture is retried once after a short delay and the workflow continues with the remaining sites; an existing screenshot is left unchanged when a replacement cannot be captured.
 
 The Stockbee snapshot targets this iframe specifically:
 

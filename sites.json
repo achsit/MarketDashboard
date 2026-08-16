@@ -53,6 +53,8 @@
     "url": "https://www.a1trading.com/free-data-dashboards/aaii-sentiment-survey/",
     "file": "aaii.png",
     "waitAfterLoadMs": 25000,
+    "navigationTimeoutMs": 30000,
+    "retryDelayMs": 5000,
     "scrollY": 200,
     "selector": "iframe.responsive-iframe"
   },
