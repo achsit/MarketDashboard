@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #121a2b;
+      --panel-2: #182235;
+      --border: rgba(255,255,255,.09);
+      --text: #e8eefc;
+      --muted: #9cafc9;
+      --accent: #7dd3fc;
+      --shadow: 0 18px 40px rgba(0,0,0,.28);
+      --radius: 18px;
+      --gap: 18px;
+      --max: 1480px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(34,211,238,.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(59,130,246,.12), transparent 22%),
+        linear-gradient(180deg, #0a1120 0%, #0b1220 100%);
+    }
+    button, a { color: inherit; font: inherit; }
+    .wrap {
+      width: min(calc(100% - 28px), var(--max));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+    .hero {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(10,17,32,.92), rgba(10,17,32,.72));
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+	.hero-inner {
+	  width: min(calc(100% - 28px), var(--max));
+	  margin: 0 auto;
+	  padding: 18px 0 14px;
+	  overflow: hidden;
+	  transition: padding .24s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	.hero-top {
+	  max-height: 160px;
+	  opacity: 1;
+	  overflow: hidden;
+	  transition:
+		max-height .24s cubic-bezier(0.16, 1, 0.3, 1),
+		opacity .18s ease,
+		margin .24s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.hero.is-collapsed .hero-top {
+	  max-height: 0;
+	  opacity: 0;
+	  margin: 0;
+	  pointer-events: none;
+	}
+	.hero.is-collapsed .hero-inner {
+	  padding: 6px 0;
+	}
+
+	.hero.is-collapsed .toc {
+	  margin-top: 0;
+	}
+	.hero {
+	  transition: background .2s ease, box-shadow .2s ease;
+	}
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 1.15rem + 1.8vw, 2.6rem);
+      line-height: 1.05;
+      letter-spacing: -.03em;
+    }
+    .sub {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .98rem;
+      max-width: 74ch;
+    }
+	.toc {
+	  display: flex;
+	  gap: 10px;
+	  flex-wrap: wrap;
+	  margin-top: 14px;
+	  transition: margin-top .24s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+    .toc a {
+      padding: 6px 12px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 999px;
+      font-size: .88rem;
+      color: #dce7fb;
+      text-decoration: none;
+    }
+    section {
+      margin-top: 28px;
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(18,26,43,.92), rgba(18,26,43,.78));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(1.05rem, .95rem + .8vw, 1.5rem);
+      letter-spacing: -.02em;
+    }
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+    .grid {
+      display: grid;
+      gap: var(--gap);
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: start;
+    }
+    .card {
+      grid-column: span 12;
+      padding: 0;
+      text-align: left;
+      background: linear-gradient(180deg, rgba(24,34,53,.9), rgba(17,24,39,.94));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
+      cursor: zoom-in;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(125,211,252,.32);
+      box-shadow: 0 16px 34px rgba(0,0,0,.26);
+    }
+    .thumb {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #0f172a;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      padding: 12px 14px 14px;
+    }
+    .title {
+      font-size: .96rem;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -.01em;
+    }
+    .caption {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+    .dim {
+      color: var(--muted);
+      font-size: .78rem;
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+    .w-12 { grid-column: span 12; }
+    .w-8 { grid-column: span 12; }
+    .w-6 { grid-column: span 12; }
+    .w-4 { grid-column: span 12; }
+    .w-3 { grid-column: span 12; }
+    @media (min-width: 700px) {
+      .w-8 { grid-column: span 8; }
+      .w-6 { grid-column: span 6; }
+      .w-4 { grid-column: span 6; }
+      .w-3 { grid-column: span 4; }
+    }
+    @media (min-width: 1100px) {
+      .w-4 { grid-column: span 4; }
+      .w-3 { grid-column: span 3; }
+    }
+	@media (min-width: 700px) {
+	  #sentiment .grid {
+		grid-template-columns: 1fr 1.3fr;
+		grid-template-areas:
+		  "fear aaii"
+		  "naaim aaii";
+		align-items: stretch;
+	  }
+
+	  #sentiment .card-fear {
+		grid-area: fear;
+	  }
+
+	  #sentiment .card-naaim {
+		grid-area: naaim;
+	  }
+
+	  #sentiment .card-aaii {
+		grid-area: aaii;
+	  }
+
+	  #sentiment .card-aaii .thumb {
+		width: 100%;
+		height: auto;
+	  }
+	}
+	@media (min-width: 700px) {
+	  #breadth .grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-areas:
+		  "ushl spx"
+		  "ushl compq"
+		  "nya indu";
+		gap: var(--gap);
+		align-items: stretch;
+	  }
+
+	  #breadth .card-ushl { grid-area: ushl !important; }
+	  #breadth .card-spx { grid-area: spx !important; }
+	  #breadth .card-compq { grid-area: compq !important; }
+	  #breadth .card-nya { grid-area: nya !important; }
+	  #breadth .card-indu { grid-area: indu !important; }
+	}
+	@media (min-width: 700px) {
+	  #events .grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-areas:
+		  "earnings economic"
+		  "spotgamma economic";
+		gap: var(--gap);
+		align-items: stretch;
+	  }
+
+	  #events .card-earnings  { grid-area: earnings; }
+	  #events .card-economic  { grid-area: economic; }
+	  #events .card-spotgamma { grid-area: spotgamma; }
+
+	  #events .card-earnings,
+	  #events .card-economic,
+	  #events .card-spotgamma {
+		width: 100%;
+		height: 100%;
+	  }
+
+	  /* Optional: make SpotGamma chart fill its card more */
+	  #events .card-spotgamma .thumb {
+		width: 100%;
+		height: auto;
+	  }
+	}
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(3, 7, 18, .82);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-panel {
+      width: min(96vw, 1500px);
+      max-height: 92vh;
+      background: linear-gradient(180deg, rgba(16,23,36,.98), rgba(12,18,29,.98));
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,.45);
+    }
+    .lightbox-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .lightbox-title {
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+    .lightbox-sub {
+      color: var(--muted);
+      font-size: .84rem;
+      margin-top: 3px;
+    }
+    .lightbox-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .lightbox-actions a,
+    .lightbox-actions button {
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 13px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .lightbox-body {
+      padding: 12px;
+      overflow: auto;
+      max-height: calc(92vh - 78px);
+      background: #0b1220;
+    }
+    .lightbox-body img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #0f172a;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+
+	<header class="hero" id="hero">
+	  <div class="hero-inner">
+		<div class="hero-top" id="heroTop">
+		  <h1>Market Dashboard</h1>
+		  <div class="sub">A single-page visual briefing arranged from price action to sentiment, breadth, exits, macro structure, and upcoming events. First click enlarges a chart, then use the source button in the viewer to open its landing page.</div>
+		</div>
+		<nav class="toc">
+		  <a href="#performance">1. Market Performance</a>
+		  <a href="#sentiment">2. Market Sentiment</a>
+		  <a href="#breadth">3. Market Breadth</a>
+		  <a href="#exit">4. Exit Indicators</a>
+		  <a href="#economic">5. Economic Indicators</a>
+		  <a href="#events">6. Important Events</a>
+		</nav>
+	  </div>
+	</header>
+  <main class="wrap">
+    <section id="performance">
+      <div class="section-head"><div><h2>1. Market Performance</h2><p>Start with the broad tape, then compare daily and weekly participation through the heat maps.</p></div></div>
+      <div class="grid">
+        <button class="card w-12 js-open" data-title="Index Performance" data-dim="Previous Trading Day Intraday Chart" data-img="screenshots/finviz.png" data-link="https://finviz.com/">
+          <img class="thumb" src="screenshots/finviz.png" alt="Finviz market indexes" width="1426" height="205">
+          <div class="meta"><div><div class="title">Index Performance</div><div class="caption">Previous Trading Day Intraday Chart</div></div><div class="dim">Finviz</div></div>
+        </button>
+        <button class="card w-6 js-open" data-title="Heatmap (D)" data-dim="Daily Change Sector & Industry Heatmap" data-img="screenshots/heatmap_d.png" data-link="https://finviz.com/map?t=sec_all">
+          <img class="thumb" src="screenshots/heatmap_d.png" alt="Finviz daily heat map" width="1552" height="862">
+          <div class="meta"><div><div class="title">Heatmap (D)</div><div class="caption">Daily Change Sector & Industry Heatmap</div></div><div class="dim">Finviz</div></div>
+        </button>
+        <button class="card w-6 js-open" data-title="Heatmap (W)" data-dim="Weekly Change Sector & Industry Heatmap" data-img="screenshots/heatmap_w.png" data-link="https://finviz.com/map?t=sec_all&st=w1">
+          <img class="thumb" src="screenshots/heatmap_w.png" alt="Finviz weekly heat map" width="1552" height="862">
+          <div class="meta"><div><div class="title">Heatmap (W)</div><div class="caption">Weekly Change Sector & Industry Heatmap</div></div><div class="dim">Finviz</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="sentiment">
+      <div class="section-head"><div><h2>2. Market Sentiment</h2><p>Sentiment sits after price so the page reads as action first, psychology second.</p></div></div>
+      <div class="grid">
+        <button class="card js-open card-fear" data-title="Fear & Greed Index" data-dim="Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect" data-img="screenshots/fear-greed.png" data-link="https://edition.cnn.com/markets/fear-and-greed">
+          <img class="thumb" src="screenshots/fear-greed.png" alt="Fear and Greed index" width="1026" height="427">
+          <div class="meta"><div><div class="title">Fear & Greed Index</div><div class="caption">Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect</div></div><div class="dim">CNN</div></div>
+        </button>
+        <button class="card js-open card-aaii" data-title="AAII Investor Sentiment" data-dim="Opinions of individual investors on where the market is heading in the next six months" data-img="screenshots/aaii.png" data-link="https://www.a1trading.com/free-data-dashboards/aaii-sentiment-survey/">
+          <img class="thumb" src="screenshots/aaii.png" alt="AAII sentiment survey" width="1000" height="876">
+          <div class="meta"><div><div class="title">AAII Investor Sentiment</div><div class="caption">Opinions of individual investors on where the market is heading in the next six months</div></div><div class="dim">A1Trading</div></div>
+        </button>
+        <button class="card js-open card-naaim" data-title="NAAIM Exposure Index" data-dim="Actual adjustments active risk managers have made to client accounts over the past two weeks" data-img="screenshots/naaim.png" data-link="https://stockcharts.com/sc3/ui/?s=%21NAAIM&id=p26777962202">
+          <img class="thumb" src="screenshots/naaim.png" alt="NAAIM exposure index" width="990" height="664">
+          <div class="meta"><div><div class="title">NAAIM Exposure Index</div><div class="caption">Actual adjustments active risk managers have made to client accounts over the past two weeks</div></div><div class="dim">NAAIM</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="breadth">
+      <div class="section-head"><div><h2>3. Market Breadth</h2><p>The breadth block starts with the headline participation chart, then compares index-level participation beneath it.</p></div></div>
+      <div class="grid">
+        <button class="card js-open card-ushl" data-title="US New Highs-New Lows Index & Advance-Decline Line" data-dim="Positive net new highs show broad market strength and a healthy bull market; A rising NYAD confirms that a market rally is backed by widespread stock participation" data-img="screenshots/ushl.png" data-link="https://stockcharts.com/sc3/ui/?s=%24USHL&id=p77545961209">
+          <img class="thumb" src="screenshots/ushl.png" alt="US high-low breadth chart" width="900" height="811">
+          <div class="meta"><div><div class="title">US New Highs-New Lows Index & Advance-Decline Line</div><div class="caption">Positive net new highs show broad market strength and a healthy bull market; A rising NYAD confirms that a market rally is backed by widespread stock participation</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+        <button class="card js-open card-spx" data-title="SPX Percent of Stocks Above 50/200 MA" data-dim="Finding short-term overbought/oversold pullbacks & determining the primary macro market regime" data-img="screenshots/abv50200_SP500.png" data-link="https://stockcharts.com/sc3/ui/?s=%24SPX&id=p67949611453">
+          <img class="thumb" src="screenshots/abv50200_SP500.png" alt="S&P 500 above 50 and 200 day average" width="990" height="817">
+          <div class="meta"><div><div class="title">SPX Percent of Stocks Above 50/200 MA</div><div class="caption">Finding short-term overbought/oversold pullbacks & determining the primary macro market regime</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+        <button class="card js-open card-compq" data-title="COMPQ Percent of Stocks Above 50/200 MA" data-dim="Finding short-term overbought/oversold pullbacks & determining the primary macro market regime" data-img="screenshots/abv50200_COMPQ.png" data-link="https://stockcharts.com/sc3/ui/?s=%24COMPQ&id=p40105966136">
+          <img class="thumb" src="screenshots/abv50200_COMPQ.png" alt="NASDAQ above 50 and 200 day average" width="990" height="817">
+          <div class="meta"><div><div class="title">COMPQ Percent of Stocks Above 50/200 MA</div><div class="caption">Finding short-term overbought/oversold pullbacks & determining the primary macro market regime</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+        <button class="card js-open card-nya" data-title="NYA Percent of Stocks Above 50/200 MA" data-dim="Finding short-term overbought/oversold pullbacks & determining the primary macro market regime" data-img="screenshots/abv50200_NYA.png" data-link="https://stockcharts.com/sc3/ui/?s=%24NYA&id=p88333577275">
+          <img class="thumb" src="screenshots/abv50200_NYA.png" alt="NYSE above 50 and 200 day average" width="990" height="817">
+          <div class="meta"><div><div class="title">NYA Percent of Stocks Above 50/200 MA</div><div class="caption">Finding short-term overbought/oversold pullbacks & determining the primary macro market regime</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+        <button class="card js-open card-indu" data-title="INDU Percent of Stocks Above 50/200 MA" data-dim="Finding short-term overbought/oversold pullbacks & determining the primary macro market regime" data-img="screenshots/abv50200_INDU.png" data-link="https://stockcharts.com/sc3/ui/?s=%24INDU&id=p10788395394">
+          <img class="thumb" src="screenshots/abv50200_INDU.png" alt="Dow above 50 and 200 day average" width="990" height="817">
+          <div class="meta"><div><div class="title">INDU Percent of Stocks Above 50/200 MA</div><div class="caption">Finding short-term overbought/oversold pullbacks & determining the primary macro market regime</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="exit">
+      <div class="section-head"><div><h2>4. Exit Indicator</h2><p>These are paired as risk-off checks: implied volatility and credit stress.</p></div></div>
+      <div class="grid">
+        <button class="card w-6 js-open" data-title="Volatility Index" data-dim="Values below 20 indicate a calm market, while values above 30 signal high investor anxiety, uncertainty, or market sell-offs" data-img="screenshots/vix.png" data-link="https://stockcharts.com/sc3/ui/?s=%24VIX&id=p41274960794">
+          <img class="thumb" src="screenshots/vix.png" alt="VIX chart" width="900" height="534">
+          <div class="meta"><div><div class="title">Volatility Index</div><div class="caption">Values below 20 indicate a calm market, while values above 30 signal high investor anxiety, uncertainty, or market sell-offs</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+        <button class="card w-6 js-open" data-title="High Yield Index Option-Adjusted Spread" data-dim="Value below 4 signals a strong economy where investors are confident and willing to accept less premium for taking on default risk, while value above 5 signals extreme market stress, economic fear, or an impending recession as investors panic-sell corporate debt" data-img="screenshots/hyioas.png" data-link="https://stockcharts.com/sc3/ui/?s=%24%24HYIOAS&id=p33700603858">
+          <img class="thumb" src="screenshots/hyioas.png" alt="High yield option-adjusted spread" width="990" height="970">
+          <div class="meta"><div><div class="title">High Yield Index Option-Adjusted Spread</div><div class="caption">Value below 4 signals a strong economy where investors are confident and willing to accept less premium for taking on default risk, while value above 5 signals extreme market stress, economic fear, or an impending recession as investors panic-sell corporate debt</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="economic">
+      <div class="section-head"><div><h2>5. Economic Indicator</h2><p>Macro structure follows risk checks, moving from rate expectations to curve shape and term-spread recession signal.</p></div></div>
+      <div class="grid">
+        <button class="card w-4 js-open" data-title="Conditional Meeting Probabilities" data-dim="Likelihood that the Fed will change the Federal target rate at upcoming FOMC meetings" data-img="screenshots/cme.png" data-link="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html">
+          <img class="thumb" src="screenshots/cme.png" alt="CME FedWatch" width="440" height="314">
+          <div class="meta"><div><div class="title">Conditional Meeting Probabilities</div><div class="caption">Likelihood that the Fed will change the Federal target rate at upcoming FOMC meetings</div></div><div class="dim">CME Group</div></div>
+        </button>
+        <button class="card w-4 js-open" data-title="10-Year Treasury Constant Maturity Minus 3-Month Treasury Constant Maturity" data-dim="Positve means investors expect the economy to grow and demand higher interest rates against inflation; Negative means extreme investor anxiety, investors believe economic trouble is brewing soon and rush to lock in long-term 10-year yields before the Federal Reserve is forced to slash interest rates to combat a recession" data-img="screenshots/t10y3m.png" data-link="https://fred.stlouisfed.org/series/T10Y3M">
+          <img class="thumb" src="screenshots/t10y3m.png" alt="10 year minus 3 month spread" width="1320" height="466">
+          <div class="meta"><div><div class="title">10-Year Treasury Constant Maturity Minus 3-Month Treasury Constant Maturity</div><div class="caption">Positve means investors expect the economy to grow and demand higher interest rates against inflation; Negative means extreme investor anxiety, investors believe economic trouble is brewing soon and rush to lock in long-term 10-year yields before the Federal Reserve is forced to slash interest rates to combat a recession</div></div><div class="dim">FRED</div></div>
+        </button>
+        <button class="card w-4 js-open" data-title="Dynamic Yield Curve" data-dim="Normally slopes up from left to right, implies healthy, expanding economy with normal inflation expecations; Flat implies economic transition or uncertainty; Inverted implies heavy fear of an impending recession" data-img="screenshots/yieldcurve.png" data-link="https://stockcharts.com/freecharts/yieldcurve.php">
+          <img class="thumb" src="screenshots/yieldcurve.png" alt="Yield curve chart" width="800" height="451">
+          <div class="meta"><div><div class="title">Dynamic Yield Curve</div><div class="caption">Normally slopes up from left to right, implies healthy, expanding economy with normal inflation expecations; Flat implies economic transition or uncertainty; Inverted implies heavy fear of an impending recession</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+      </div>
+    </section>
+
+	<section id="events">
+	  <div class="section-head"><div><h2>6. Important Events</h2><p>The page ends with the practical calendar layer: earnings first, then the longer economic slate.</p></div></div>
+	  <div class="grid">
+		<button class="card js-open card-earnings" data-title="Earnings Calendar" data-dim="For upcoming big names" data-img="screenshots/earnings-calendar.png" data-link="https://finance.yahoo.com/calendar/earnings/">
+		  <img class="thumb" src="screenshots/earnings-calendar.png" alt="Earnings calendar" width="1006" height="940">
+		  <div class="meta"><div><div class="title">Earnings Calendar</div><div class="caption">For upcoming big names</div></div><div class="dim">Yahoo! Finance</div></div>
+		</button>
+		<button class="card js-open card-spotgamma" data-title="Implied Earnings Moves Chart" data-dim="The estimated move is based off of the at-the-money straddle for the first expiration date after a stock’s scheduled earnings date" data-img="screenshots/spotgamma-earnings.png" data-link="https://spotgamma.com/free-tools/implied-earnings-moves/">
+		  <img class="thumb" src="screenshots/spotgamma-earnings.png" alt="Implied Earnings Moves Chart" width="800" height="536">
+		  <div class="meta"><div><div class="title">Implied Earnings Moves Chart</div><div class="caption">The estimated move is based off of the at-the-money straddle for the first expiration date after a stock’s scheduled earnings date</div></div><div class="dim">SpotGamma</div></div>
+		</button>
+		<button class="card js-open card-economic" data-title="Economic Calendar" data-dim="For upcoming major US events" data-img="screenshots/economic-calendar.png" data-link="https://finviz.com/calendar/economic?t=economic">
+		  <img class="thumb" src="screenshots/economic-calendar.png" alt="Economic calendar" width="595" height="1805">
+		  <div class="meta"><div><div class="title">Economic Calendar</div><div class="caption">For upcoming major US events</div></div><div class="dim">Finviz</div></div>
+		</button>
+	  </div>
+	</section>
+  </main>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lightbox-panel">
+      <div class="lightbox-top">
+        <div>
+          <div class="lightbox-title" id="lightboxTitle">Image</div>
+          <div class="lightbox-sub" id="lightboxSub">Dimensions</div>
+        </div>
+        <div class="lightbox-actions">
+          <a id="lightboxLink" href="#" target="_blank" rel="noopener noreferrer">Open source site</a>
+          <button type="button" id="lightboxClose">Close</button>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <img id="lightboxImg" src="" alt="Expanded dashboard image">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxSub = document.getElementById('lightboxSub');
+    const lightboxLink = document.getElementById('lightboxLink');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    document.querySelectorAll('.js-open').forEach(card => {
+      card.addEventListener('click', () => {
+        lightboxImg.src = card.dataset.img;
+        lightboxTitle.textContent = card.dataset.title;
+        lightboxSub.textContent = card.dataset.dim;
+        lightboxLink.href = card.dataset.link;
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+      });
+    });
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      lightbox.setAttribute('aria-hidden', 'true');
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+    });
+	
+	const hero = document.getElementById('hero');
+
+	const HERO_COLLAPSE_Y = 220;
+	const HERO_EXPAND_Y = 70;
+
+	let heroPinnedOpen = false;
+	let heroCollapsed = false;
+	let ticking = false;
+
+	function applyHeroState() {
+	  hero.classList.toggle('is-collapsed', heroCollapsed && !heroPinnedOpen);
+	}
+
+	function updateHeroState() {
+	  const y = window.scrollY;
+
+	  if (!heroPinnedOpen) {
+		if (!heroCollapsed && y >= HERO_COLLAPSE_Y) {
+		  heroCollapsed = true;
+		} else if (heroCollapsed && y <= HERO_EXPAND_Y) {
+		  heroCollapsed = false;
+		}
+	  }
+	  applyHeroState();
+	  ticking = false;
+	}
+
+	window.addEventListener('scroll', () => {
+	  if (!ticking) {
+		ticking = true;
+		requestAnimationFrame(updateHeroState);
+	  }
+	}, { passive: true });
+
+	hero.addEventListener('mouseenter', () => {
+	  if (heroCollapsed) {
+		heroPinnedOpen = true;
+		applyHeroState();
+	  }
+	});
+
+	hero.addEventListener('mouseleave', () => {
+	  heroPinnedOpen = false;
+	  applyHeroState();
+	});
+
+	updateHeroState();
+  </script>
+</body>
+</html>
+

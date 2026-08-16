@@ -1,0 +1,86 @@
+name: Scheduled Capture
+
+on:
+  schedule:
+    - cron: '13 22 * * 0-6'
+  workflow_dispatch:
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run capture script
+        run: node capture.js
+
+      - name: List files after capture
+        run: |
+          ls -la screenshots
+          find screenshots -maxdepth 2 -type f | sort
+
+      - name: Install PDF dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install img2pdf pillow
+
+      - name: Create captioned PDF
+        run: python3 create_pdf.py
+          
+      # --- Fixed Personal OAuth Upload Step ---
+      - name: Setup Rclone Engine
+        uses: AnimMouse/setup-rclone@v1
+        with:
+          rclone_version: 'v1.75.0'
+
+      - name: Upload screenshots to Google Drive
+        env:
+          GDRIVE_CLIENT_ID: ${{ secrets.GDRIVE_CLIENT_ID }}
+          GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
+          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: |
+          mkdir -p ~/.config/rclone
+
+          cat > ~/.config/rclone/rclone.conf <<EOF
+          [personaldrive]
+          type = drive
+          client_id = ${GDRIVE_CLIENT_ID}
+          client_secret = ${GDRIVE_CLIENT_SECRET}
+          scope = drive
+          root_folder_id = ${GDRIVE_FOLDER_ID}
+          token = {"access_token":"ya29.placeholder","token_type":"Bearer","refresh_token":"${GDRIVE_REFRESH_TOKEN}","expiry":"2000-01-01T00:00:00Z"}
+          EOF
+
+          rclone about personaldrive: -vv
+          rclone copy screenshots/ personaldrive: --create-empty-src-dirs -vv
+          
+      - name: Commit updated screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add screenshots
+          git commit --allow-empty -m "Update screenshots (Forced scheduled run)"
+          git push
+
+      - name: Upload screenshots artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+          if-no-files-found: error
