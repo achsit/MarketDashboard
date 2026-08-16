@@ -88,11 +88,9 @@
   },
   {
     "name": "Stockbee Market Monitor",
-    "url": "https://stockbee.blogspot.com/p/mm.html",
+    "url": "https://docs.google.com/spreadsheets/u/0/d/1O6OhS7ciA8zwfycBfGPbP2fWJnR0pn2UUvFZVDP9jpE/pub",
     "file": "stockbee-mm.png",
-    "waitAfterLoadMs": 15000,
-    "selector": "iframe[src*='0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c']",
-    "waitForFrame": true
+    "waitAfterLoadMs": 10000
   },
   {
     "name": "Trading Economics Calendar",

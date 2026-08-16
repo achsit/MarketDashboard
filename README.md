@@ -52,8 +52,4 @@ Before the first scheduled run, open the repository's **Settings > Pages** and s
 
 The scheduled workflow runs every day at 06:30 in UTC+8 (22:30 UTC). Each run commits the refreshed PNG snapshots to `screenshots/` and deploys the dashboard through GitHub Pages. If an external site is unavailable, its capture is retried once after a short delay and the workflow continues with the remaining sites; an existing screenshot is left unchanged when a replacement cannot be captured.
 
-The Stockbee snapshot targets this iframe specifically:
-
-```html
-<iframe frameborder="0" height="1200" src="https://docs.google.com/spreadsheet/pub?key=0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c&amp;output=html&amp;widget=true" width="760"></iframe>
-```
+The Stockbee snapshot captures the published Google Sheets document directly.
