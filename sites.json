@@ -1,31 +1,31 @@
 [
   {
     "name": "SPY",
-    "url": "https://www.tradingview.com/x/hlOxoG1a/",
+    "url": "https://finviz.com/stock?t=SPY&ty=c&ta=1&p=d&r=m3",
     "file": "spy.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/h/hlOxoG1a.png",
-    "waitAfterLoadMs": 5000
+    "waitAfterLoadMs": 5000,
+    "selector": "canvas.second"
   },
   {
     "name": "QQQ",
-    "url": "https://www.tradingview.com/x/SXcNQhyX/",
+    "url": "https://finviz.com/stock?t=QQQ&ty=c&ta=1&p=d&r=m3",
     "file": "qqq.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/s/SXcNQhyX.png",
-    "waitAfterLoadMs": 5000
+    "waitAfterLoadMs": 5000,
+    "selector": "canvas.second"
   },
   {
     "name": "DIA",
-    "url": "https://www.tradingview.com/x/urPaor8j/",
+    "url": "https://finviz.com/stock?t=DIA&ty=c&ta=1&p=d&r=m3",
     "file": "dia.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/u/urPaor8j.png",
-    "waitAfterLoadMs": 5000
+    "waitAfterLoadMs": 5000,
+    "selector": "canvas.second"
   },
   {
     "name": "IWM",
-    "url": "https://www.tradingview.com/x/dBmikxJn/",
+    "url": "https://finviz.com/stock?t=IWM&ty=c&ta=1&p=d&r=m3",
     "file": "iwm.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/d/dBmikxJn.png",
-    "waitAfterLoadMs": 5000
+    "waitAfterLoadMs": 5000,
+    "selector": "canvas.second"
   },
   {
     "name": "Heat Map - Daily",
