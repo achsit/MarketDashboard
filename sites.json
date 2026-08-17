@@ -1,30 +1,30 @@
 [
   {
     "name": "SPY",
-    "url": "https://www.tradingview.com/x/ajV6Dgvm/",
+    "url": "https://www.tradingview.com/x/hlOxoG1a/",
     "file": "spy.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/a/ajV6Dgvm.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/h/hlOxoG1a.png",
     "waitAfterLoadMs": 5000
   },
   {
     "name": "QQQ",
-    "url": "https://www.tradingview.com/x/tQfEerK0/",
+    "url": "https://www.tradingview.com/x/SXcNQhyX/",
     "file": "qqq.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/t/tQfEerK0.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/s/SXcNQhyX.png",
     "waitAfterLoadMs": 5000
   },
   {
     "name": "DIA",
-    "url": "https://www.tradingview.com/x/IBjwCyO3/",
+    "url": "https://www.tradingview.com/x/urPaor8j/",
     "file": "dia.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/i/IBjwCyO3.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/u/urPaor8j.png",
     "waitAfterLoadMs": 5000
   },
   {
     "name": "IWM",
-    "url": "https://www.tradingview.com/x/P9lJDhrX/",
+    "url": "https://www.tradingview.com/x/dBmikxJn/",
     "file": "iwm.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/p/P9lJDhrX.png",
+    "snapshot": "https://s3.tradingview.com/snapshots/d/dBmikxJn.png",
     "waitAfterLoadMs": 5000
   },
   {
@@ -59,13 +59,6 @@
     "selector": "iframe.responsive-iframe"
   },
   {
-    "name": "NAAIM Exposure Index",
-    "url": "https://stockcharts.com/sc3/ui/?s=%21NAAIM&id=p26777962202",
-    "file": "naaim.png",
-    "waitAfterLoadMs": 7000,
-    "selector": "#chart-image"
-  },
-  {
     "name": "EQWL",
     "url": "https://www.tradingview.com/x/cCp1MObH/",
     "file": "eqwl.png",
@@ -98,5 +91,12 @@
     "file": "economic-calendar.png",
     "waitAfterLoadMs": 10000,
     "selector": "table.table"
+  },
+  {
+    "name": "Barchart Futures Trading Calendar",
+    "url": "https://www.barchart.com/futures/trading-calendar",
+    "file": "barchart-calendar.png",
+    "waitAfterLoadMs": 10000,
+    "selector": "main"
   }
 ]

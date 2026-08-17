@@ -9,10 +9,15 @@ This project automatically captures screenshots of key financial dashboards and 
 ### Dashboard Sections
 
 1. **Market Performance** — SPY, QQQ, DIA, and IWM daily views from TradingView, plus Finviz daily/weekly sector heat maps
-2. **Market Sentiment** — CNN Fear & Greed Index, AAII Investor Sentiment Survey, NAAIM Exposure Index
-3. **Market Breadth** — EQWL equal-weight proxy, US New Highs–Lows, and SPX percent above 50/200-day MA
-4. **Market Monitor** — Stockbee market-health checklist
-5. **Economic Calendar** — Trading Economics upcoming macro releases and central-bank events
+2. **Market Monitor** — Stockbee market-health checklist
+3. **Market Sentiment** — CNN Fear & Greed Index and AAII Investor Sentiment Survey
+4. **Market Breadth** — EQWL equal-weight proxy, US New Highs–Lows, and SPX percent above 50/200-day MA
+5. **Screen Counts** — number of names meeting the two Finviz scan screens
+6. **Economic Calendar** — Trading Economics and Barchart futures trading calendars
+
+### Scan counts
+
+The capture job logs the latest counts for the two Finviz scan rules into `scan-history.json`, which is displayed on the dashboard and preserved as a rolling history over time.
 
 ## How It Works
 

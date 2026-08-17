@@ -5,6 +5,19 @@ const { chromium } = require('playwright');
 const baseDir = __dirname;
 const screenshotDir = path.join(baseDir, 'screenshots');
 const sites = JSON.parse(fs.readFileSync(path.join(baseDir, 'sites.json'), 'utf8'));
+const scanHistoryPath = path.join(baseDir, 'scan-history.json');
+const scanDefinitions = [
+  {
+    key: 'up20_5d',
+    label: 'Up 20% in 5 days',
+    url: 'https://finviz.com/screener?v=210&p=d&f=ind_stocksonly,sh_avgvol_o100,sh_price_o5,ta_perf_1w20o&ft=4&ta=0&dr=m6&o=-perfytd'
+  },
+  {
+    key: 'down20_5d',
+    label: 'Down 20% in 5 days',
+    url: 'https://finviz.com/screener?v=210&p=d&f=ind_stocksonly,sh_avgvol_o100,sh_price_o5,ta_perf_1w20u&ft=4&ta=0&dr=m6&o=-perfytd'
+  }
+];
 
 if (!fs.existsSync(screenshotDir)) {
   fs.mkdirSync(screenshotDir, { recursive: true });
@@ -156,6 +169,109 @@ async function fetchSnapshot(site, targetFile) {
   console.log(`Saved snapshot image: ${site.file}`);
 }
 
+function readJsonFile(filePath, fallback) {
+  try {
+    if (!fs.existsSync(filePath)) return fallback;
+    const raw = fs.readFileSync(filePath, 'utf8');
+    if (!raw.trim()) return fallback;
+    return JSON.parse(raw);
+  } catch (error) {
+    console.warn(`Could not read ${filePath}: ${error.message}`);
+    return fallback;
+  }
+}
+
+function writeJsonFile(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n');
+}
+
+async function collectFinvizScanCount(page, scan) {
+  await page.goto(scan.url, {
+    waitUntil: 'domcontentloaded',
+    timeout: 90000
+  });
+
+  await page.locator('#screener-total').first().waitFor({
+    state: 'visible',
+    timeout: 30000
+  });
+
+  const text = await page.locator('#screener-total').first().innerText();
+  const match = text.match(/\b(\d+)\s*\/\s*(\d+)\s*Total\b/i) || text.match(/\b(\d+)\s*Total\b/i);
+  const count = match ? Number((match[2] || match[1]).replace(/,/g, '')) : null;
+
+  if (count === null) {
+    throw new Error(`No scan count found for ${scan.label}: ${text}`);
+  }
+
+  return {
+    key: scan.key,
+    label: scan.label,
+    url: scan.url,
+    count,
+    timestamp: new Date().toISOString(),
+    rawText: text.trim()
+  };
+}
+
+async function captureScanCounts(browser) {
+  const entries = [];
+
+  for (const scan of scanDefinitions) {
+    const context = await browser.newContext({
+      viewport: { width: 1800, height: 1200 },
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+      ignoreHTTPSErrors: true,
+      deviceScaleFactor: 1
+    });
+
+    const page = await context.newPage();
+
+    try {
+      console.log(`Collecting scan count: ${scan.label}`);
+      const result = await collectFinvizScanCount(page, scan);
+      entries.push(result);
+    } catch (error) {
+      console.error(`Failed to collect scan count for ${scan.label}: ${error.message}`);
+    } finally {
+      await page.close();
+      await context.close();
+    }
+  }
+
+  return entries;
+}
+
+async function updateScanHistory(entries) {
+  if (!entries.length) return;
+
+  const data = readJsonFile(scanHistoryPath, { updatedAt: null, scans: {} });
+  const timestamp = new Date().toISOString();
+
+  for (const entry of entries) {
+    const key = entry.key;
+    const scanState = data.scans[key] || { label: entry.label, url: entry.url, history: [] };
+    const history = Array.isArray(scanState.history) ? scanState.history : [];
+    history.push({ timestamp: entry.timestamp, count: entry.count });
+
+    if (history.length > 180) {
+      scanState.history = history.slice(-180);
+    } else {
+      scanState.history = history;
+    }
+
+    scanState.label = entry.label;
+    scanState.url = entry.url;
+    scanState.count = entry.count;
+    scanState.lastUpdated = entry.timestamp;
+    data.scans[key] = scanState;
+  }
+
+  data.updatedAt = timestamp;
+  writeJsonFile(scanHistoryPath, data);
+  console.log(`Saved scan counts to ${scanHistoryPath}`);
+}
+
 async function handleDefault(page, site, targetFile) {
   if (site.snapshot) {
     try {
@@ -267,6 +383,9 @@ async function captureSite(browser, site) {
     for (const site of sites) {
       await captureSite(browser, site);
     }
+
+    const scanEntries = await captureScanCounts(browser);
+    await updateScanHistory(scanEntries);
 
     const stamp = new Date().toISOString();
     fs.writeFileSync(path.join(screenshotDir, 'last-updated.txt'), stamp);

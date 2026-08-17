@@ -181,6 +181,44 @@
       font-size: .78rem;
       white-space: nowrap;
       padding-top: 2px;
+    .scan-guide {
+      margin-top: var(--gap);
+      padding: 16px 18px;
+      background: rgba(125,211,252,.06);
+      border: 1px solid rgba(125,211,252,.16);
+      border-radius: var(--radius);
+    }
+    .scan-guide-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .scan-guide h3 {
+      margin: 0;
+      font-size: .92rem;
+    }
+    .scan-guide ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.55;
+    }
+    .scan-guide strong {
+      color: var(--text);
+    }
+    .scan-guide-note {
+      margin: 14px 0 0;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      font-size: .82rem;
+    }
+    @media (max-width: 620px) {
+      .scan-guide-grid {
+        grid-template-columns: 1fr;
+      }
+    }
     }
     .w-12 { grid-column: span 12; }
     .w-8 { grid-column: span 12; }
@@ -201,17 +239,12 @@
 	  #sentiment .grid {
 		grid-template-columns: 1fr 1.3fr;
 		grid-template-areas:
-		  "fear aaii"
-		  "naaim aaii";
+		  "fear aaii";
 		align-items: stretch;
 	  }
 
 	  #sentiment .card-fear {
 		grid-area: fear;
-	  }
-
-	  #sentiment .card-naaim {
-		grid-area: naaim;
 	  }
 
 	  #sentiment .card-aaii {
@@ -320,10 +353,11 @@
 		</div>
 		<nav class="toc">
 		  <a href="#performance">1. Market Performance</a>
-		  <a href="#sentiment">2. Market Sentiment</a>
-		  <a href="#breadth">3. Market Breadth</a>
-		  <a href="#monitor">4. Market Monitor</a>
-		  <a href="#calendar">5. Economic Calendar</a>
+		  <a href="#monitor">2. Market Monitor</a>
+		  <a href="#sentiment">3. Market Sentiment</a>
+		  <a href="#breadth">4. Market Breadth</a>
+		  <a href="#scan-counts">5. Screen Counts</a>
+		  <a href="#calendar">6. Economic Calendar</a>
 		</nav>
 	  </div>
 	</header>
@@ -331,19 +365,19 @@
     <section id="performance">
       <div class="section-head"><div><h2>1. Market Performance</h2><p>Broad tape view through the major ETFs, then daily and weekly participation via the heat maps.</p></div></div>
       <div class="grid">
-        <button class="card w-3 js-open" data-title="SPY" data-dim="S&P 500 ETF daily view" data-img="screenshots/spy.png" data-link="https://www.tradingview.com/x/ajV6Dgvm/">
+        <button class="card w-3 js-open" data-title="SPY" data-dim="S&P 500 ETF daily view" data-img="screenshots/spy.png" data-link="https://www.tradingview.com/x/hlOxoG1a/">
           <img class="thumb" src="screenshots/spy.png" alt="SPY chart" width="1200" height="628">
           <div class="meta"><div><div class="title">SPY</div><div class="caption">S&P 500 ETF daily view</div></div><div class="dim">TradingView</div></div>
         </button>
-        <button class="card w-3 js-open" data-title="QQQ" data-dim="Nasdaq-100 ETF daily view" data-img="screenshots/qqq.png" data-link="https://www.tradingview.com/x/tQfEerK0/">
+        <button class="card w-3 js-open" data-title="QQQ" data-dim="Nasdaq-100 ETF daily view" data-img="screenshots/qqq.png" data-link="https://www.tradingview.com/x/SXcNQhyX/">
           <img class="thumb" src="screenshots/qqq.png" alt="QQQ chart" width="1200" height="628">
           <div class="meta"><div><div class="title">QQQ</div><div class="caption">Nasdaq-100 ETF daily view</div></div><div class="dim">TradingView</div></div>
         </button>
-        <button class="card w-3 js-open" data-title="DIA" data-dim="Dow Jones ETF daily view" data-img="screenshots/dia.png" data-link="https://www.tradingview.com/x/IBjwCyO3/">
+        <button class="card w-3 js-open" data-title="DIA" data-dim="Dow Jones ETF daily view" data-img="screenshots/dia.png" data-link="https://www.tradingview.com/x/urPaor8j/">
           <img class="thumb" src="screenshots/dia.png" alt="DIA chart" width="1200" height="628">
           <div class="meta"><div><div class="title">DIA</div><div class="caption">Dow Jones ETF daily view</div></div><div class="dim">TradingView</div></div>
         </button>
-        <button class="card w-3 js-open" data-title="IWM" data-dim="Russell 2000 ETF daily view" data-img="screenshots/iwm.png" data-link="https://www.tradingview.com/x/P9lJDhrX/">
+        <button class="card w-3 js-open" data-title="IWM" data-dim="Russell 2000 ETF daily view" data-img="screenshots/iwm.png" data-link="https://www.tradingview.com/x/dBmikxJn/">
           <img class="thumb" src="screenshots/iwm.png" alt="IWM chart" width="1200" height="628">
           <div class="meta"><div><div class="title">IWM</div><div class="caption">Russell 2000 ETF daily view</div></div><div class="dim">TradingView</div></div>
         </button>
@@ -358,8 +392,18 @@
       </div>
     </section>
 
+    <section id="monitor">
+      <div class="section-head"><div><h2>2. Market Monitor</h2><p>Stockbee market-health checklist for tracking regime and breadth conditions.</p></div></div>
+      <div class="grid">
+        <button class="card w-12 js-open" data-title="Stockbee Market Monitor" data-dim="Daily market-health checklist" data-img="screenshots/stockbee-mm.png" data-link="https://docs.google.com/spreadsheets/u/0/d/1O6OhS7ciA8zwfycBfGPbP2fWJnR0pn2UUvFZVDP9jpE/pub">
+          <img class="thumb" src="screenshots/stockbee-mm.png" alt="Stockbee market monitor" width="1200" height="800">
+          <div class="meta"><div><div class="title">Stockbee Market Monitor</div><div class="caption">Daily market-health checklist</div></div><div class="dim">Stockbee</div></div>
+        </button>
+      </div>
+    </section>
+
     <section id="sentiment">
-      <div class="section-head"><div><h2>2. Market Sentiment</h2><p>Sentiment sits after price so the page reads as action first, psychology second.</p></div></div>
+      <div class="section-head"><div><h2>3. Market Sentiment</h2><p>Sentiment sits after price so the page reads as action first, psychology second.</p></div></div>
       <div class="grid">
         <button class="card js-open card-fear" data-title="Fear & Greed Index" data-dim="Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect" data-img="screenshots/fear-greed.png" data-link="https://edition.cnn.com/markets/fear-and-greed">
           <img class="thumb" src="screenshots/fear-greed.png" alt="Fear and Greed index" width="1026" height="427">
@@ -369,15 +413,11 @@
           <img class="thumb" src="screenshots/aaii.png" alt="AAII sentiment survey" width="1000" height="876">
           <div class="meta"><div><div class="title">AAII Investor Sentiment</div><div class="caption">Opinions of individual investors on where the market is heading in the next six months</div></div><div class="dim">A1Trading</div></div>
         </button>
-        <button class="card js-open card-naaim" data-title="NAAIM Exposure Index" data-dim="Actual adjustments active risk managers have made to client accounts over the past two weeks" data-img="screenshots/naaim.png" data-link="https://stockcharts.com/sc3/ui/?s=%21NAAIM&id=p26777962202">
-          <img class="thumb" src="screenshots/naaim.png" alt="NAAIM exposure index" width="990" height="664">
-          <div class="meta"><div><div class="title">NAAIM Exposure Index</div><div class="caption">Actual adjustments active risk managers have made to client accounts over the past two weeks</div></div><div class="dim">NAAIM</div></div>
-        </button>
       </div>
     </section>
 
     <section id="breadth">
-      <div class="section-head"><div><h2>3. Market Breadth</h2><p>Headline participation and index-level internals.</p></div></div>
+      <div class="section-head"><div><h2>4. Market Breadth</h2><p>Headline participation and index-level internals.</p></div></div>
       <div class="grid">
         <button class="card w-6 js-open" data-title="EQWL" data-dim="Equal-weight S&P 500 participation proxy" data-img="screenshots/eqwl.png" data-link="https://www.tradingview.com/x/cCp1MObH/">
           <img class="thumb" src="screenshots/eqwl.png" alt="EQWL chart" width="1200" height="628">
@@ -394,22 +434,50 @@
       </div>
     </section>
 
-    <section id="monitor">
-      <div class="section-head"><div><h2>4. Market Monitor</h2><p>Stockbee market-health checklist for tracking regime and breadth conditions.</p></div></div>
+    <section id="scan-counts">
+      <div class="section-head"><div><h2>5. Screen Counts</h2><p>Count of names meeting each 5-day Finviz scan condition at capture time.</p></div></div>
       <div class="grid">
-        <button class="card w-12 js-open" data-title="Stockbee Market Monitor" data-dim="Daily market-health checklist" data-img="screenshots/stockbee-mm.png" data-link="https://docs.google.com/spreadsheets/u/0/d/1O6OhS7ciA8zwfycBfGPbP2fWJnR0pn2UUvFZVDP9jpE/pub">
-          <img class="thumb" src="screenshots/stockbee-mm.png" alt="Stockbee market monitor" width="1200" height="800">
-          <div class="meta"><div><div class="title">Stockbee Market Monitor</div><div class="caption">Daily market-health checklist</div></div><div class="dim">Stockbee</div></div>
-        </button>
+        <div class="card w-6 js-scan-card" data-scan-key="up20_5d">
+          <div class="meta"><div><div class="title">Up 20% in 5 days</div><div class="caption">Finviz screener count</div></div><div class="dim" id="scan-up20_5d-count">—</div></div>
+          <div class="meta" style="padding-top:0"><div><div class="caption" id="scan-up20_5d-history">No data yet</div></div></div>
+        </div>
+        <div class="card w-6 js-scan-card" data-scan-key="down20_5d">
+          <div class="meta"><div><div class="title">Down 20% in 5 days</div><div class="caption">Finviz screener count</div></div><div class="dim" id="scan-down20_5d-count">—</div></div>
+          <div class="meta" style="padding-top:0"><div><div class="caption" id="scan-down20_5d-history">No data yet</div></div></div>
+        </div>
       </div>
+      <aside class="scan-guide" aria-label="Screen count interpretation guide">
+        <div class="scan-guide-grid">
+          <div>
+            <h3>Bullish (bounce likely)</h3>
+            <ul>
+              <li><strong>Up 20% count &lt; 20–25</strong>, especially below 15</li>
+              <li>Or <strong>Down 20% count &gt; 100</strong></li>
+              <li><strong>Strongest:</strong> Up below 20 and Down above 100</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Cautious / Pullback risk</h3>
+            <ul>
+              <li><strong>Up 20% count &gt; 100</strong></li>
+              <li>Higher risk when above 150–200</li>
+            </ul>
+          </div>
+        </div>
+        <p class="scan-guide-note">Acts as a short-term oscillator with a 3–5 day horizon.</p>
+      </aside>
     </section>
 
     <section id="calendar">
-      <div class="section-head"><div><h2>5. Economic Calendar</h2><p>Upcoming macro releases and central-bank events.</p></div></div>
+      <div class="section-head"><div><h2>6. Economic Calendar</h2><p>Upcoming macro releases, central-bank events, and futures schedule updates.</p></div></div>
       <div class="grid">
-        <button class="card w-12 js-open" data-title="Trading Economics Calendar" data-dim="Major US and global economic events" data-img="screenshots/economic-calendar.png" data-link="https://tradingeconomics.com/calendar">
+        <button class="card w-6 js-open" data-title="Trading Economics Calendar" data-dim="Major US and global economic events" data-img="screenshots/economic-calendar.png" data-link="https://tradingeconomics.com/calendar">
           <img class="thumb" src="screenshots/economic-calendar.png" alt="Economic calendar" width="1200" height="900">
           <div class="meta"><div><div class="title">Trading Economics Calendar</div><div class="caption">Major US and global economic events</div></div><div class="dim">Trading Economics</div></div>
+        </button>
+        <button class="card w-6 js-open" data-title="Barchart Futures Trading Calendar" data-dim="Futures market trading calendar and economic release schedule" data-img="screenshots/economic-calendar.png" data-link="https://www.barchart.com/futures/trading-calendar">
+          <img class="thumb" src="screenshots/economic-calendar.png" alt="Barchart futures trading calendar" width="1200" height="900">
+          <div class="meta"><div><div class="title">Barchart Futures Trading Calendar</div><div class="caption">Futures market trading calendar and economic release schedule</div></div><div class="dim">Barchart</div></div>
         </button>
       </div>
     </section>
@@ -512,6 +580,37 @@
 	});
 
 	updateHeroState();
+
+    async function loadScanHistory() {
+      try {
+        const res = await fetch('scan-history.json');
+        if (!res.ok) return;
+        const data = await res.json();
+        const keys = ['up20_5d', 'down20_5d'];
+        const scans = data.scans || {};
+
+        keys.forEach(key => {
+          const countEl = document.getElementById(`scan-${key}-count`);
+          const historyEl = document.getElementById(`scan-${key}-history`);
+          if (!countEl || !historyEl) return;
+
+          const scan = scans[key];
+          if (!scan || !scan.count) {
+            countEl.textContent = '—';
+            historyEl.textContent = 'No data yet';
+            return;
+          }
+
+          countEl.textContent = String(scan.count);
+          const history = Array.isArray(scan.history) ? scan.history.slice(-6) : [];
+          historyEl.textContent = history.length ? history.map(item => item.count).join(' → ') : String(scan.count);
+        });
+      } catch (error) {
+        console.warn('Scan history unavailable:', error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadScanHistory);
   </script>
 </body>
 </html>
