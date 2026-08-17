@@ -45,6 +45,12 @@ jobs:
           git commit --allow-empty -m "Update screenshots"
           git push
 
+      - name: Prepare Pages output
+        run: |
+          mkdir -p pages
+          cp index.html pages/
+          cp -r screenshots pages/
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
@@ -53,8 +59,9 @@ jobs:
       - name: Upload dashboard to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: pages
 
       - name: Deploy dashboard to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+        continue-on-error: true
