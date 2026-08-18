@@ -32,6 +32,7 @@
     "url": "https://finviz.com/map?colorscale=colorblind",
     "file": "heatmap_d.png",
     "waitAfterLoadMs": 5000,
+    "finvizHeatmap": true,
     "selector": "canvas"
   },
   {
@@ -39,6 +40,7 @@
     "url": "https://finviz.com/map?st=w1&colorscale=colorblind",
     "file": "heatmap_w.png",
     "waitAfterLoadMs": 5000,
+    "finvizHeatmap": true,
     "selector": "canvas"
   },
   {
@@ -57,13 +59,6 @@
     "retryDelayMs": 5000,
     "scrollY": 200,
     "selector": "iframe.responsive-iframe"
-  },
-  {
-    "name": "EQWL",
-    "url": "https://www.tradingview.com/x/cCp1MObH/",
-    "file": "eqwl.png",
-    "snapshot": "https://s3.tradingview.com/snapshots/c/cCp1MObH.png",
-    "waitAfterLoadMs": 5000
   },
   {
     "name": "StockCharts USHL",
@@ -98,5 +93,12 @@
     "file": "barchart-calendar.png",
     "waitAfterLoadMs": 10000,
     "selector": "main"
+  },
+  {
+    "name": "Exit Indicator",
+    "url": "https://stockcharts.com/sc3/ui/?s=%24VIX&id=p41274960794",
+    "file": "exit-indicator.png",
+    "waitAfterLoadMs": 7000,
+    "selector": "#chart-image"
   }
 ]

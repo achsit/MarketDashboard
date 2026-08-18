@@ -50,6 +50,22 @@ async function dismissCommonPopups(page) {
   }
 }
 
+async function dismissFinvizEliteDialog(page) {
+  const closeButton = page.locator('button[data-testid="elite-features-dialog-close"]').first();
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      if (await closeButton.isVisible({ timeout: 1000 })) {
+        await closeButton.click({ timeout: 2000 });
+        await sleep(500);
+        return;
+      }
+    } catch (_) {}
+
+    if (attempt < 2) await sleep(1000);
+  }
+}
+
 async function handleYahooEarnings(page, site, targetFile) {
   await page.setViewportSize({ width: 2000, height: 1600 });
   await sleep(1000);
@@ -288,6 +304,10 @@ async function handleDefault(page, site, targetFile) {
   }
 
   if (site.selector) {
+    if (site.finvizHeatmap) {
+      await dismissFinvizEliteDialog(page);
+    }
+
     const element = page.locator(site.selector).first();
     await element.waitFor({ state: 'visible', timeout: 15000 });
 
@@ -331,6 +351,10 @@ async function runCapture(page, site, targetFile) {
 
   await sleep(site.waitAfterLoadMs || 5000);
   await dismissCommonPopups(page);
+
+  if (site.finvizHeatmap) {
+    await dismissFinvizEliteDialog(page);
+  }
 
   if (site.name === 'Yahoo Earnings Calendar') {
     await handleYahooEarnings(page, site, targetFile);

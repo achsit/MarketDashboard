@@ -139,6 +139,7 @@
       grid-column: span 12;
       padding: 0;
       text-align: left;
+      text-decoration: none;
       background: linear-gradient(180deg, rgba(24,34,53,.9), rgba(17,24,39,.94));
       border: 1px solid rgba(255,255,255,.08);
       border-radius: var(--radius);
@@ -354,9 +355,9 @@
 		<nav class="toc">
 		  <a href="#performance">1. Market Performance</a>
 		  <a href="#monitor">2. Market Monitor</a>
-		  <a href="#sentiment">3. Market Sentiment</a>
-		  <a href="#breadth">4. Market Breadth</a>
-		  <a href="#scan-counts">5. Screen Counts</a>
+      <a href="#scan-counts">3. Screen Counts</a>
+      <a href="#sentiment">4. Market Sentiment</a>
+      <a href="#breadth">5. Market Breadth</a>
 		  <a href="#calendar">6. Economic Calendar</a>
 		</nav>
 	  </div>
@@ -402,49 +403,17 @@
       </div>
     </section>
 
-    <section id="sentiment">
-      <div class="section-head"><div><h2>3. Market Sentiment</h2><p>Sentiment sits after price so the page reads as action first, psychology second.</p></div></div>
-      <div class="grid">
-        <button class="card js-open card-fear" data-title="Fear & Greed Index" data-dim="Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect" data-img="screenshots/fear-greed.png" data-link="https://edition.cnn.com/markets/fear-and-greed">
-          <img class="thumb" src="screenshots/fear-greed.png" alt="Fear and Greed index" width="1026" height="427">
-          <div class="meta"><div><div class="title">Fear & Greed Index</div><div class="caption">Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect</div></div><div class="dim">CNN</div></div>
-        </button>
-        <button class="card js-open card-aaii" data-title="AAII Investor Sentiment" data-dim="Opinions of individual investors on where the market is heading in the next six months" data-img="screenshots/aaii.png" data-link="https://www.a1trading.com/free-data-dashboards/aaii-sentiment-survey/">
-          <img class="thumb" src="screenshots/aaii.png" alt="AAII sentiment survey" width="1000" height="876">
-          <div class="meta"><div><div class="title">AAII Investor Sentiment</div><div class="caption">Opinions of individual investors on where the market is heading in the next six months</div></div><div class="dim">A1Trading</div></div>
-        </button>
-      </div>
-    </section>
-
-    <section id="breadth">
-      <div class="section-head"><div><h2>4. Market Breadth</h2><p>Headline participation and index-level internals.</p></div></div>
-      <div class="grid">
-        <button class="card w-6 js-open" data-title="EQWL" data-dim="Equal-weight S&P 500 participation proxy" data-img="screenshots/eqwl.png" data-link="https://www.tradingview.com/x/cCp1MObH/">
-          <img class="thumb" src="screenshots/eqwl.png" alt="EQWL chart" width="1200" height="628">
-          <div class="meta"><div><div class="title">EQWL</div><div class="caption">Equal-weight S&P 500 participation proxy</div></div><div class="dim">TradingView</div></div>
-        </button>
-        <button class="card w-6 js-open" data-title="US New Highs-New Lows Index & Advance-Decline Line" data-dim="Positive net new highs show broad market strength and a healthy bull market" data-img="screenshots/ushl.png" data-link="https://stockcharts.com/sc3/ui/?s=%24USHL&id=p77545961209">
-          <img class="thumb" src="screenshots/ushl.png" alt="US high-low breadth chart" width="900" height="811">
-          <div class="meta"><div><div class="title">US New Highs-New Lows</div><div class="caption">Positive net new highs show broad market strength</div></div><div class="dim">Stockcharts</div></div>
-        </button>
-        <button class="card w-12 js-open" data-title="SPX Percent of Stocks Above 50/200 MA" data-dim="Short-term overbought/oversold read and primary macro regime" data-img="screenshots/abv50200_SP500.png" data-link="https://stockcharts.com/sc3/ui/?s=%24SPX&id=p67949611453">
-          <img class="thumb" src="screenshots/abv50200_SP500.png" alt="S&P 500 above 50 and 200 day average" width="990" height="817">
-          <div class="meta"><div><div class="title">SPX % Above 50/200 MA</div><div class="caption">Short-term overbought/oversold read and primary macro regime</div></div><div class="dim">Stockcharts</div></div>
-        </button>
-      </div>
-    </section>
-
     <section id="scan-counts">
-      <div class="section-head"><div><h2>5. Screen Counts</h2><p>Count of names meeting each 5-day Finviz scan condition at capture time.</p></div></div>
+      <div class="section-head"><div><h2>3. Screen Counts</h2><p>Count of names meeting each 5-day Finviz scan condition at capture time.</p></div></div>
       <div class="grid">
-        <div class="card w-6 js-scan-card" data-scan-key="up20_5d">
+        <a class="card w-6 js-scan-card" data-scan-key="up20_5d" href="https://finviz.com/screener?v=210&amp;p=d&amp;f=ind_stocksonly,sh_avgvol_o100,sh_price_o5,ta_perf_1w20o&amp;ft=4&amp;ta=0&amp;dr=m6&amp;o=-perfytd" target="_blank" rel="noopener noreferrer">
           <div class="meta"><div><div class="title">Up 20% in 5 days</div><div class="caption">Finviz screener count</div></div><div class="dim" id="scan-up20_5d-count">—</div></div>
           <div class="meta" style="padding-top:0"><div><div class="caption" id="scan-up20_5d-history">No data yet</div></div></div>
-        </div>
-        <div class="card w-6 js-scan-card" data-scan-key="down20_5d">
+        </a>
+        <a class="card w-6 js-scan-card" data-scan-key="down20_5d" href="https://finviz.com/screener?v=210&amp;p=d&amp;f=ind_stocksonly,sh_avgvol_o100,sh_price_o5,ta_perf_1w20u&amp;ft=4&amp;ta=0&amp;dr=m6&amp;o=-perfytd" target="_blank" rel="noopener noreferrer">
           <div class="meta"><div><div class="title">Down 20% in 5 days</div><div class="caption">Finviz screener count</div></div><div class="dim" id="scan-down20_5d-count">—</div></div>
           <div class="meta" style="padding-top:0"><div><div class="caption" id="scan-down20_5d-history">No data yet</div></div></div>
-        </div>
+        </a>
       </div>
       <aside class="scan-guide" aria-label="Screen count interpretation guide">
         <div class="scan-guide-grid">
@@ -468,15 +437,47 @@
       </aside>
     </section>
 
+    <section id="sentiment">
+      <div class="section-head"><div><h2>4. Market Sentiment</h2><p>Sentiment sits after price so the page reads as action first, psychology second.</p></div></div>
+      <div class="grid">
+        <button class="card js-open card-fear" data-title="Fear & Greed Index" data-dim="Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect" data-img="screenshots/fear-greed.png" data-link="https://edition.cnn.com/markets/fear-and-greed">
+          <img class="thumb" src="screenshots/fear-greed.png" alt="Fear and Greed index" width="1026" height="427">
+          <div class="meta"><div><div class="title">Fear & Greed Index</div><div class="caption">Excessive fear tends to drive down share prices, and too much greed tends to have the opposite effect</div></div><div class="dim">CNN</div></div>
+        </button>
+        <button class="card js-open card-aaii" data-title="AAII Investor Sentiment" data-dim="Opinions of individual investors on where the market is heading in the next six months" data-img="screenshots/aaii.png" data-link="https://www.a1trading.com/free-data-dashboards/aaii-sentiment-survey/">
+          <img class="thumb" src="screenshots/aaii.png" alt="AAII sentiment survey" width="1000" height="876">
+          <div class="meta"><div><div class="title">AAII Investor Sentiment</div><div class="caption">Opinions of individual investors on where the market is heading in the next six months</div></div><div class="dim">A1Trading</div></div>
+        </button>
+      </div>
+    </section>
+
+    <section id="breadth">
+      <div class="section-head"><div><h2>5. Market Breadth</h2><p>Headline participation and index-level internals.</p></div></div>
+      <div class="grid">
+        <button class="card w-6 js-open" data-title="US New Highs-New Lows Index & Advance-Decline Line" data-dim="Positive net new highs show broad market strength and a healthy bull market" data-img="screenshots/ushl.png" data-link="https://stockcharts.com/sc3/ui/?s=%24USHL&id=p77545961209">
+          <img class="thumb" src="screenshots/ushl.png" alt="US high-low breadth chart" width="900" height="811">
+          <div class="meta"><div><div class="title">US New Highs-New Lows</div><div class="caption">Positive net new highs show broad market strength</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+        <button class="card w-12 js-open" data-title="SPX Percent of Stocks Above 50/200 MA" data-dim="Short-term overbought/oversold read and primary macro regime" data-img="screenshots/abv50200_SP500.png" data-link="https://stockcharts.com/sc3/ui/?s=%24SPX&id=p67949611453">
+          <img class="thumb" src="screenshots/abv50200_SP500.png" alt="S&P 500 above 50 and 200 day average" width="990" height="817">
+          <div class="meta"><div><div class="title">SPX % Above 50/200 MA</div><div class="caption">Short-term overbought/oversold read and primary macro regime</div></div><div class="dim">Stockcharts</div></div>
+        </button>
+      </div>
+    </section>
+
     <section id="calendar">
       <div class="section-head"><div><h2>6. Economic Calendar</h2><p>Upcoming macro releases, central-bank events, and futures schedule updates.</p></div></div>
       <div class="grid">
+        <button class="card w-12 js-open" data-title="Exit Indicator" data-dim="VIX exit indicator chart" data-img="screenshots/exit-indicator.png" data-link="https://stockcharts.com/sc3/ui/?s=%24VIX&amp;id=p41274960794">
+          <img class="thumb" src="screenshots/exit-indicator.png" alt="Exit Indicator dashboard" width="1200" height="900">
+          <div class="meta"><div><div class="title">Exit Indicator</div><div class="caption">VIX exit indicator chart</div></div><div class="dim">StockCharts</div></div>
+        </button>
         <button class="card w-6 js-open" data-title="Trading Economics Calendar" data-dim="Major US and global economic events" data-img="screenshots/economic-calendar.png" data-link="https://tradingeconomics.com/calendar">
           <img class="thumb" src="screenshots/economic-calendar.png" alt="Economic calendar" width="1200" height="900">
           <div class="meta"><div><div class="title">Trading Economics Calendar</div><div class="caption">Major US and global economic events</div></div><div class="dim">Trading Economics</div></div>
         </button>
-        <button class="card w-6 js-open" data-title="Barchart Futures Trading Calendar" data-dim="Futures market trading calendar and economic release schedule" data-img="screenshots/economic-calendar.png" data-link="https://www.barchart.com/futures/trading-calendar">
-          <img class="thumb" src="screenshots/economic-calendar.png" alt="Barchart futures trading calendar" width="1200" height="900">
+        <button class="card w-6 js-open" data-title="Barchart Futures Trading Calendar" data-dim="Futures market trading calendar and economic release schedule" data-img="screenshots/barchart-calendar.png" data-link="https://www.barchart.com/futures/trading-calendar">
+          <img class="thumb" src="screenshots/barchart-calendar.png" alt="Barchart futures trading calendar" width="1200" height="900">
           <div class="meta"><div><div class="title">Barchart Futures Trading Calendar</div><div class="caption">Futures market trading calendar and economic release schedule</div></div><div class="dim">Barchart</div></div>
         </button>
       </div>
