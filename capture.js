@@ -66,6 +66,53 @@ async function dismissFinvizEliteDialog(page) {
   }
 }
 
+// Finviz's cookie/consent dialog (Sourcepoint) renders inside its own iframe
+async function dismissFinvizConsentFrames(page) {
+  const selectors = [
+    'button[title="Reject All"]',
+    'button[title="Accept All"]',
+    'button:has-text("Reject All")',
+    'button:has-text("Accept All")',
+    '.message-button'
+  ];
+
+  for (const frame of page.frames()) {
+    if (!/sp_message_iframe/i.test(frame.name() || frame.url() || '')) continue;
+
+    for (const selector of selectors) {
+      try {
+        const locator = frame.locator(selector).first();
+        if (await locator.isVisible({ timeout: 1000 })) {
+          await locator.click({ timeout: 1500 });
+          await sleep(500);
+          return;
+        }
+      } catch (_) {}
+    }
+  }
+}
+
+function isFinvizUrl(url) {
+  return typeof url === 'string' && url.includes('finviz.com');
+}
+
+async function dismissFinvizPopups(page) {
+  await dismissFinvizConsentFrames(page);
+  await dismissFinvizEliteDialog(page);
+}
+
+// used to catch popups that render late, right before the screenshot is taken
+async function finvizPopupVisible(page) {
+  try {
+    return await page.evaluate(() => {
+      const el = document.querySelector('button[data-testid="elite-features-dialog-close"]');
+      return !!el && el.offsetParent !== null;
+    });
+  } catch (_) {
+    return false;
+  }
+}
+
 async function handleYahooEarnings(page, site, targetFile) {
   await page.setViewportSize({ width: 2000, height: 1600 });
   await sleep(1000);
@@ -304,8 +351,8 @@ async function handleDefault(page, site, targetFile) {
   }
 
   if (site.selector) {
-    if (site.finvizHeatmap) {
-      await dismissFinvizEliteDialog(page);
+    if (isFinvizUrl(site.url)) {
+      await dismissFinvizPopups(page);
     }
 
     const element = page.locator(site.selector).first();
@@ -314,6 +361,14 @@ async function handleDefault(page, site, targetFile) {
     if (site.waitForFrame) {
       const frameBody = element.contentFrame().locator('body');
       await frameBody.waitFor({ state: 'visible', timeout: 30000 });
+    }
+
+    if (isFinvizUrl(site.url)) {
+      await dismissFinvizPopups(page);
+      if (await finvizPopupVisible(page)) {
+        await sleep(500);
+        await dismissFinvizPopups(page);
+      }
     }
 
     await element.screenshot({ path: targetFile });
@@ -352,8 +407,8 @@ async function runCapture(page, site, targetFile) {
   await sleep(site.waitAfterLoadMs || 5000);
   await dismissCommonPopups(page);
 
-  if (site.finvizHeatmap) {
-    await dismissFinvizEliteDialog(page);
+  if (isFinvizUrl(site.url)) {
+    await dismissFinvizPopups(page);
   }
 
   if (site.name === 'Yahoo Earnings Calendar') {
