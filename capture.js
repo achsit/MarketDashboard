@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
+const { getTradingDateKey, isTradingDay } = require('./lib/trading-day');
 
 const baseDir = __dirname;
 const screenshotDir = path.join(baseDir, 'screenshots');
@@ -310,24 +311,38 @@ async function updateScanHistory(entries) {
 
   const data = readJsonFile(scanHistoryPath, { updatedAt: null, scans: {} });
   const timestamp = new Date().toISOString();
+  let changed = false;
 
   for (const entry of entries) {
+    if (!isTradingDay(entry.timestamp)) {
+      console.log(`Skipping ${entry.label} count: ${entry.timestamp} is not a trading day (weekend/holiday)`);
+      continue;
+    }
+
     const key = entry.key;
     const scanState = data.scans[key] || { label: entry.label, url: entry.url, history: [] };
     const history = Array.isArray(scanState.history) ? scanState.history : [];
-    history.push({ timestamp: entry.timestamp, count: entry.count });
+    const dateKey = getTradingDateKey(entry.timestamp);
+    const existingIndex = history.findIndex(item => getTradingDateKey(item.timestamp) === dateKey);
 
-    if (history.length > 180) {
-      scanState.history = history.slice(-180);
+    if (existingIndex >= 0) {
+      history[existingIndex] = { timestamp: entry.timestamp, count: entry.count };
     } else {
-      scanState.history = history;
+      history.push({ timestamp: entry.timestamp, count: entry.count });
     }
 
+    scanState.history = history.length > 180 ? history.slice(-180) : history;
     scanState.label = entry.label;
     scanState.url = entry.url;
     scanState.count = entry.count;
     scanState.lastUpdated = entry.timestamp;
     data.scans[key] = scanState;
+    changed = true;
+  }
+
+  if (!changed) {
+    console.log('No trading-day scan counts to save; skipping scan-history.json update');
+    return;
   }
 
   data.updatedAt = timestamp;
