@@ -177,6 +177,37 @@
       color: var(--muted);
       font-size: .78rem;
     }
+    .scan-history {
+      padding: 0 14px 12px;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+    .scan-history svg {
+      display: block;
+      width: 100%;
+      height: 220px;
+      overflow: visible;
+    }
+    .scan-history .scan-gridline {
+      stroke: rgba(255,255,255,.1);
+      stroke-dasharray: 3 4;
+    }
+    .scan-history .scan-axis-label {
+      fill: var(--muted);
+      font: 11px ui-sans-serif, system-ui, sans-serif;
+    }
+    .scan-history .scan-trend {
+      fill: none;
+      stroke: #7dd3fc;
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+    .scan-history .scan-point {
+      fill: #7dd3fc;
+      stroke: #121a2b;
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+    }
     .dim {
       color: var(--muted);
       font-size: .78rem;
@@ -408,11 +439,11 @@
       <div class="grid">
         <a class="card w-6 js-scan-card" data-scan-key="up20_5d" href="https://finviz.com/screener?v=210&amp;p=d&amp;f=ind_stocksonly,sh_avgvol_o100,sh_price_o5,ta_perf_1w20o&amp;ft=4&amp;ta=0&amp;dr=m6&amp;o=-perfytd" target="_blank" rel="noopener noreferrer">
           <div class="meta"><div><div class="title">Up 20% in 5 days</div><div class="caption">Finviz screener count</div></div><div class="dim" id="scan-up20_5d-count">—</div></div>
-          <div class="meta" style="padding-top:0"><div><div class="caption" id="scan-up20_5d-history">No data yet</div></div></div>
+          <div class="scan-history" id="scan-up20_5d-history" aria-label="Up 20% in 5 days count history">Loading history…</div>
         </a>
         <a class="card w-6 js-scan-card" data-scan-key="down20_5d" href="https://finviz.com/screener?v=210&amp;p=d&amp;f=ind_stocksonly,sh_avgvol_o100,sh_price_o5,ta_perf_1w20u&amp;ft=4&amp;ta=0&amp;dr=m6&amp;o=-perfytd" target="_blank" rel="noopener noreferrer">
           <div class="meta"><div><div class="title">Down 20% in 5 days</div><div class="caption">Finviz screener count</div></div><div class="dim" id="scan-down20_5d-count">—</div></div>
-          <div class="meta" style="padding-top:0"><div><div class="caption" id="scan-down20_5d-history">No data yet</div></div></div>
+          <div class="scan-history" id="scan-down20_5d-history" aria-label="Down 20% in 5 days count history">Loading history…</div>
         </a>
       </div>
       <aside class="scan-guide" aria-label="Screen count interpretation guide">
@@ -582,6 +613,98 @@
 
 	updateHeroState();
 
+    function makeScanSvgElement(name, attributes = {}) {
+      const element = document.createElementNS('http://www.w3.org/2000/svg', name);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+      return element;
+    }
+
+    function renderScanHistory(container, key, history) {
+      const width = Math.max(Math.round(container.clientWidth), 320);
+      const height = 220;
+      const margin = { top: 14, right: 12, bottom: 34, left: 48 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const counts = history.map(item => item.count);
+      const minimum = Math.min(0, ...counts);
+      const maximum = Math.max(...counts);
+      const range = maximum - minimum || 1;
+      const lowerBound = minimum - range * 0.08;
+      const upperBound = maximum + range * 0.08;
+      const x = index => margin.left + (history.length === 1 ? plotWidth / 2 : index * plotWidth / (history.length - 1));
+      const y = count => margin.top + (upperBound - count) / (upperBound - lowerBound) * plotHeight;
+      const firstDate = new Date(history[0].timestamp);
+      const lastDate = new Date(history[history.length - 1].timestamp);
+      const spansYears = firstDate.getUTCFullYear() !== lastDate.getUTCFullYear();
+      const dateOptions = { month: 'short', day: 'numeric', timeZone: 'UTC' };
+      if (spansYears) dateOptions.year = '2-digit';
+
+      const formatDate = timestamp => new Intl.DateTimeFormat('en-US', dateOptions).format(new Date(timestamp));
+      const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+      const svg = makeScanSvgElement('svg', {
+        viewBox: `0 0 ${width} ${height}`,
+        role: 'img',
+        'aria-label': `${key === 'up20_5d' ? 'Up 20%' : 'Down 20%'} in 5 days scan counts from ${formatDate(history[0].timestamp)} to ${formatDate(history[history.length - 1].timestamp)}`
+      });
+      const title = makeScanSvgElement('title');
+      title.textContent = `${history.length} daily screen counts`;
+      svg.append(title);
+
+      for (let tick = 0; tick <= 3; tick += 1) {
+        const value = upperBound - (upperBound - lowerBound) * tick / 3;
+        const tickY = margin.top + plotHeight * tick / 3;
+        const gridline = makeScanSvgElement('line', {
+          x1: margin.left,
+          x2: width - margin.right,
+          y1: tickY,
+          y2: tickY,
+          class: 'scan-gridline'
+        });
+        const label = makeScanSvgElement('text', {
+          x: margin.left - 8,
+          y: tickY + 4,
+          'text-anchor': 'end',
+          class: 'scan-axis-label'
+        });
+        label.textContent = numberFormat.format(Math.round(value));
+        svg.append(gridline, label);
+      }
+
+      const tickCount = Math.min(history.length, width < 480 ? 3 : 5);
+      for (let tick = 0; tick < tickCount; tick += 1) {
+        const index = tickCount === 1 ? 0 : Math.round(tick * (history.length - 1) / (tickCount - 1));
+        const label = makeScanSvgElement('text', {
+          x: x(index),
+          y: height - 8,
+          'text-anchor': tick === 0 ? 'start' : tick === tickCount - 1 ? 'end' : 'middle',
+          class: 'scan-axis-label'
+        });
+        label.textContent = formatDate(history[index].timestamp);
+        svg.append(label);
+      }
+
+      const path = makeScanSvgElement('path', {
+        d: history.map((item, index) => `${index ? 'L' : 'M'} ${x(index)} ${y(item.count)}`).join(' '),
+        class: 'scan-trend'
+      });
+      svg.append(path);
+
+      history.forEach((item, index) => {
+        const point = makeScanSvgElement('circle', {
+          cx: x(index),
+          cy: y(item.count),
+          r: history.length > 80 ? 2 : 3.5,
+          class: 'scan-point'
+        });
+        const pointTitle = makeScanSvgElement('title');
+        pointTitle.textContent = `${formatDate(item.timestamp)}: ${numberFormat.format(item.count)}`;
+        point.append(pointTitle);
+        svg.append(point);
+      });
+
+      container.replaceChildren(svg);
+    }
+
     async function loadScanHistory() {
       try {
         const res = await fetch('scan-history.json');
@@ -589,6 +712,7 @@
         const data = await res.json();
         const keys = ['up20_5d', 'down20_5d'];
         const scans = data.scans || {};
+        const chartData = new Map();
 
         keys.forEach(key => {
           const countEl = document.getElementById(`scan-${key}-count`);
@@ -596,16 +720,39 @@
           if (!countEl || !historyEl) return;
 
           const scan = scans[key];
-          if (!scan || !scan.count) {
+          const history = Array.isArray(scan?.history) ? scan.history
+            .filter(item => item && item.timestamp && item.count !== null && item.count !== '' && Number.isFinite(Number(item.count)) && Number.isFinite(Date.parse(item.timestamp)))
+            .map(item => ({ timestamp: item.timestamp, count: Number(item.count) }))
+            .sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp)) : [];
+          const hasCurrentCount = scan && scan.count !== null && scan.count !== '' && Number.isFinite(Number(scan.count));
+          const latestCount = history.length ? history[history.length - 1].count : null;
+          const currentCount = hasCurrentCount ? Number(scan.count) : latestCount;
+
+          if (currentCount === null) {
             countEl.textContent = '—';
             historyEl.textContent = 'No data yet';
             return;
           }
 
-          countEl.textContent = String(scan.count);
-          const history = Array.isArray(scan.history) ? scan.history.slice(-6) : [];
-          historyEl.textContent = history.length ? history.map(item => item.count).join(' → ') : String(scan.count);
+          countEl.textContent = new Intl.NumberFormat('en-US').format(currentCount);
+          if (!history.length) {
+            historyEl.textContent = 'No historical data yet';
+            return;
+          }
+
+          chartData.set(historyEl, { key, history });
+          renderScanHistory(historyEl, key, history);
         });
+
+        if (typeof ResizeObserver === 'function') {
+          const observer = new ResizeObserver(entries => {
+            entries.forEach(entry => {
+              const chart = chartData.get(entry.target);
+              if (chart && entry.contentRect.width > 0) renderScanHistory(entry.target, chart.key, chart.history);
+            });
+          });
+          chartData.forEach((chart, container) => observer.observe(container));
+        }
       } catch (error) {
         console.warn('Scan history unavailable:', error);
       }

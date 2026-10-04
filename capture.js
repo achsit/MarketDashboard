@@ -331,7 +331,7 @@ async function updateScanHistory(entries) {
       history.push({ timestamp: entry.timestamp, count: entry.count });
     }
 
-    scanState.history = history.length > 180 ? history.slice(-180) : history;
+    scanState.history = history;
     scanState.label = entry.label;
     scanState.url = entry.url;
     scanState.count = entry.count;
