@@ -1,31 +1,38 @@
 [
   {
     "name": "SPY",
-    "url": "https://finviz.com/stock?t=SPY&ty=c&ta=1&p=d&r=m3",
+    "url": "https://schrts.co/vwguXDNU",
     "file": "spy.png",
     "waitAfterLoadMs": 5000,
-    "selector": "canvas.second"
+    "selector": "img"
   },
   {
     "name": "QQQ",
-    "url": "https://finviz.com/stock?t=QQQ&ty=c&ta=1&p=d&r=m3",
+    "url": "https://schrts.co/iyJujjen",
     "file": "qqq.png",
     "waitAfterLoadMs": 5000,
-    "selector": "canvas.second"
+    "selector": "img"
   },
   {
     "name": "DIA",
-    "url": "https://finviz.com/stock?t=DIA&ty=c&ta=1&p=d&r=m3",
+    "url": "https://schrts.co/ShZtCvST",
     "file": "dia.png",
     "waitAfterLoadMs": 5000,
-    "selector": "canvas.second"
+    "selector": "img"
   },
   {
     "name": "IWM",
-    "url": "https://finviz.com/stock?t=IWM&ty=c&ta=1&p=d&r=m3",
+    "url": "https://schrts.co/MSAtWbQd",
     "file": "iwm.png",
     "waitAfterLoadMs": 5000,
-    "selector": "canvas.second"
+    "selector": "img"
+  },
+  {
+    "name": "MDY",
+    "url": "https://schrts.co/NrMRQFyW",
+    "file": "mdy.png",
+    "waitAfterLoadMs": 5000,
+    "selector": "img"
   },
   {
     "name": "Heat Map - Daily",

@@ -8,7 +8,7 @@ This project automatically captures screenshots of key financial dashboards and 
 
 ### Dashboard Sections
 
-1. **Market Performance** — SPY, QQQ, DIA, and IWM daily views from Finviz, plus Finviz daily/weekly sector heat maps
+1. **Market Performance** — SPY, QQQ, DIA, IWM, and MDY daily views from Schrts charts, plus Finviz daily/weekly sector heat maps
 2. **Market Monitor** — Stockbee market-health checklist
 3. **Screen Counts** — number of names meeting the two Finviz scan screens
 4. **Market Sentiment** — CNN Fear & Greed Index and AAII Investor Sentiment Survey
