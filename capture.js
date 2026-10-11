@@ -55,46 +55,29 @@ async function dismissCommonPopups(page) {
   }
 }
 
-async function removeOverlays(page) {
+async function removeFinvizAnnouncements(page) {
   try {
     await page.evaluate(() => {
-      // Click any visible close-style buttons
-      document.querySelectorAll('button, [role="button"], .close, [class*="close"], [aria-label*="Close"], [aria-label*="close"]').forEach(btn => {
-        const text = (btn.textContent || '').trim();
-        const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
-        if (text === '×' || text === '✕' || text === 'x' || text === 'X' || aria.includes('close')) {
-          try { btn.click(); } catch (_) {}
-        }
-      });
-
-      // Remove high-z or fixed/absolute overlays that look like ads or announcements
-      const candidates = Array.from(document.querySelectorAll('div, section, aside, dialog, [class*="modal"], [class*="popup"], [class*="overlay"], [class*="banner"]'));
+      // Only target known Finviz announcement overlays
+      const candidates = Array.from(document.querySelectorAll('div, section, aside, dialog'));
       for (const el of candidates) {
+        const text = (el.textContent || '').slice(0, 400).toLowerCase();
         const style = window.getComputedStyle(el);
-        const text = (el.textContent || '').slice(0, 300).toLowerCase();
-        const isOverlay = style.position === 'fixed' || style.position === 'absolute' || Number(style.zIndex || 0) > 100;
-        const looksLikePopup =
-          text.includes('why is it moving') ||
-          text.includes('matrix') ||
-          text.includes('oppenheimer') ||
-          text.includes('advertisement') ||
-          text.includes('ad ') ||
-          el.className.toLowerCase().includes('modal') ||
-          el.className.toLowerCase().includes('popup') ||
-          el.className.toLowerCase().includes('overlay') ||
-          el.className.toLowerCase().includes('banner') ||
-          el.id.toLowerCase().includes('modal') ||
-          el.id.toLowerCase().includes('popup');
-
-        if (isOverlay && looksLikePopup) {
+        const isOverlay = style.position === 'fixed' || style.position === 'absolute' || Number(style.zIndex || 0) > 50;
+        if (isOverlay && (text.includes('why is it moving') || text.includes('matrix') || text.includes('elite features'))) {
           el.remove();
         }
       }
-
-      document.body.style.overflow = 'auto';
-      document.documentElement.style.overflow = 'auto';
+      // Click close buttons that are clearly on those cards
+      document.querySelectorAll('button').forEach(btn => {
+        const text = (btn.textContent || '').trim();
+        const parentText = (btn.closest('div, section')?.textContent || '').toLowerCase();
+        if ((text === '×' || text === '✕') && (parentText.includes('why is it moving') || parentText.includes('matrix'))) {
+          try { btn.click(); } catch (_) {}
+        }
+      });
     });
-    await sleep(400);
+    await sleep(300);
   } catch (_) {}
 }
 
@@ -146,7 +129,7 @@ function isFinvizUrl(url) {
 async function dismissFinvizPopups(page) {
   await dismissFinvizConsentFrames(page);
   await dismissFinvizEliteDialog(page);
-  await removeOverlays(page);
+  await removeFinvizAnnouncements(page);
 }
 
 async function finvizPopupVisible(page) {
@@ -186,7 +169,7 @@ async function handleYahooEarnings(page, site, targetFile) {
   });
 
   await sleep(1000);
-  await removeOverlays(page);
+  await removeFinvizAnnouncements(page);
 
   await section.screenshot({ path: targetFile });
   console.log(`Saved Yahoo earnings section screenshot: ${site.file}`);
@@ -266,7 +249,7 @@ async function handleFearGreed(page, site, targetFile) {
     });
   } catch (_) {}
   await sleep(1000);
-  await removeOverlays(page);
+  await removeFinvizAnnouncements(page);
 
   const element = page.locator('div.market-tabbed-container').first();
   await element.waitFor({ state: 'visible', timeout: 15000 });
@@ -402,6 +385,46 @@ async function updateScanHistory(entries) {
   console.log(`Saved scan counts to ${scanHistoryPath}`);
 }
 
+async function handleSchrtsChart(page, site, targetFile) {
+  // schrts.co pages: pick the largest visible image (the chart), not the logo
+  await page.waitForSelector('img', { timeout: 15000 });
+  await sleep(1000);
+  const box = await page.evaluate(() => {
+    const imgs = Array.from(document.querySelectorAll('img'));
+    let best = null;
+    let bestArea = 0;
+    for (const img of imgs) {
+      const r = img.getBoundingClientRect();
+      const area = r.width * r.height;
+      if (area > bestArea && r.width > 200 && r.height > 100) {
+        bestArea = area;
+        best = img;
+      }
+    }
+    if (!best) return null;
+    best.scrollIntoView({ block: 'center' });
+    return { w: best.naturalWidth || best.width, h: best.naturalHeight || best.height };
+  });
+  await sleep(500);
+  // Screenshot the largest chart image
+  const chart = page.locator('img').filter({ hasNot: page.locator('[width="1"], [height="1"]') }).first();
+  // Better: use evaluate to mark the largest, then screenshot it
+  await page.evaluate(() => {
+    const imgs = Array.from(document.querySelectorAll('img'));
+    let best = null, bestArea = 0;
+    for (const img of imgs) {
+      const r = img.getBoundingClientRect();
+      const area = r.width * r.height;
+      if (area > bestArea && r.width > 200) { bestArea = area; best = img; }
+    }
+    if (best) best.setAttribute('data-chart-target', '1');
+  });
+  const target = page.locator('img[data-chart-target="1"]').first();
+  await target.waitFor({ state: 'visible', timeout: 10000 });
+  await target.screenshot({ path: targetFile });
+  console.log(`Saved schrts chart: ${site.file}`);
+}
+
 async function handleDefault(page, site, targetFile) {
   if (site.snapshot) {
     try {
@@ -417,9 +440,7 @@ async function handleDefault(page, site, targetFile) {
     await sleep(1500);
   }
 
-  // Always clean popups before capturing
   await dismissCommonPopups(page);
-  await removeOverlays(page);
 
   if (site.selector) {
     if (isFinvizUrl(site.url)) {
@@ -442,17 +463,12 @@ async function handleDefault(page, site, targetFile) {
       }
     }
 
-    // Final cleanup right before screenshot
-    await removeOverlays(page);
-    await sleep(300);
-
     await element.screenshot({ path: targetFile });
     console.log(`Saved selector screenshot: ${site.file}`);
     return;
   }
 
   if (site.crop) {
-    await removeOverlays(page);
     await page.screenshot({
       path: targetFile,
       clip: {
@@ -466,7 +482,6 @@ async function handleDefault(page, site, targetFile) {
     return;
   }
 
-  await removeOverlays(page);
   await page.screenshot({
     path: targetFile,
     fullPage: false
@@ -483,7 +498,6 @@ async function runCapture(page, site, targetFile) {
 
   await sleep(site.waitAfterLoadMs || 5000);
   await dismissCommonPopups(page);
-  await removeOverlays(page);
 
   if (isFinvizUrl(site.url)) {
     await dismissFinvizPopups(page);
@@ -495,6 +509,8 @@ async function runCapture(page, site, targetFile) {
     await sleep(2000);
     await dismissCommonPopups(page);
     await handleFearGreed(page, site, targetFile);
+  } else if (site.url && site.url.includes('schrts.co')) {
+    await handleSchrtsChart(page, site, targetFile);
   } else {
     await handleDefault(page, site, targetFile);
   }
