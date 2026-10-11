@@ -343,6 +343,7 @@
       border-radius: 12px;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -418,6 +419,10 @@
           <div class="meta"><div><div class="title">Down 20% in 5 days</div><div class="caption">Finviz screener count</div></div><div class="dim" id="scan-down20_5d-count">—</div></div>
           <div class="meta" style="padding-top:0"><div><div class="caption" id="scan-down20_5d-history">No data yet</div></div></div>
         </a>
+      </div>
+
+      <div style="margin-top:18px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:12px 14px 8px;">
+        <canvas id="scanChart" height="140"></canvas>
       </div>
       <aside class="scan-guide" aria-label="Screen count interpretation guide">
         <div class="scan-guide-grid">
@@ -609,6 +614,96 @@
           countEl.textContent = String(scan.count);
           const history = Array.isArray(scan.history) ? scan.history.slice(-6) : [];
           historyEl.textContent = history.length ? history.map(item => item.count).join(' → ') : String(scan.count);
+        });
+
+        // Dual-line chart
+        const upHist = (scans.up20_5d && scans.up20_5d.history) || [];
+        const downHist = (scans.down20_5d && scans.down20_5d.history) || [];
+        if (!upHist.length && !downHist.length) return;
+
+        // Build aligned date labels (use up series as primary, fall back to down)
+        const primary = upHist.length >= downHist.length ? upHist : downHist;
+        const labels = primary.map(h => h.timestamp.slice(5, 10)); // MM-DD
+
+        const upMap = Object.fromEntries(upHist.map(h => [h.timestamp.slice(0, 10), h.count]));
+        const downMap = Object.fromEntries(downHist.map(h => [h.timestamp.slice(0, 10), h.count]));
+        const dates = primary.map(h => h.timestamp.slice(0, 10));
+
+        const upData = dates.map(d => upMap[d] ?? null);
+        const downData = dates.map(d => downMap[d] ?? null);
+
+        const ctx = document.getElementById('scanChart');
+        if (!ctx || typeof Chart === 'undefined') return;
+
+        // Destroy previous chart if re-run
+        if (window._scanChart) window._scanChart.destroy();
+
+        window._scanChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Up 20% in 5d',
+                data: upData,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59,130,246,.12)',
+                borderWidth: 2,
+                pointRadius: 2,
+                pointHoverRadius: 4,
+                tension: 0.25,
+                spanGaps: true
+              },
+              {
+                label: 'Down 20% in 5d',
+                data: downData,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239,68,68,.12)',
+                borderWidth: 2,
+                pointRadius: 2,
+                pointHoverRadius: 4,
+                tension: 0.25,
+                spanGaps: true
+              },
+              {
+                label: 'Extreme (100)',
+                data: labels.map(() => 100),
+                borderColor: '#9ca3af',
+                borderWidth: 1.5,
+                borderDash: [6, 4],
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                fill: false,
+                tension: 0
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: {
+                labels: { color: '#e8eefc', font: { size: 12 } }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(15,23,42,.92)',
+                titleColor: '#e8eefc',
+                bodyColor: '#e8eefc'
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: '#9cafc9', maxTicksLimit: 12, font: { size: 11 } },
+                grid: { color: 'rgba(255,255,255,.06)' }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: { color: '#9cafc9', font: { size: 11 } },
+                grid: { color: 'rgba(255,255,255,.06)' }
+              }
+            }
+          }
         });
       } catch (error) {
         console.warn('Scan history unavailable:', error);
