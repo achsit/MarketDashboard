@@ -89,7 +89,7 @@
   },
   {
     "name": "Trading Economics Calendar",
-    "url": "https://tradingeconomics.com/calendar",
+    "url": "https://tradingeconomics.com/united-states/calendar",
     "file": "economic-calendar.png",
     "waitAfterLoadMs": 10000,
     "selector": "table.table"
