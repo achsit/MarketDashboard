@@ -425,6 +425,33 @@ async function handleSchrtsChart(page, site, targetFile) {
   console.log(`Saved schrts chart: ${site.file}`);
 }
 
+
+async function handleTradingEconomicsCalendar(page, site, targetFile) {
+  // Set cookie so only high-importance (3-star) events are shown
+  await page.context().addCookies([{
+    name: 'calendar-importance',
+    value: '3',
+    domain: '.tradingeconomics.com',
+    path: '/'
+  }]);
+
+  await page.goto(site.url, {
+    waitUntil: 'domcontentloaded',
+    timeout: site.navigationTimeoutMs || 90000
+  });
+
+  await sleep(site.waitAfterLoadMs || 8000);
+  await dismissCommonPopups(page);
+
+  // Extra wait for the filtered table
+  await page.locator('table.table').first().waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
+  await sleep(1500);
+
+  const element = page.locator('table.table').first();
+  await element.screenshot({ path: targetFile });
+  console.log(`Saved Trading Economics US 3-star calendar: ${site.file}`);
+}
+
 async function handleDefault(page, site, targetFile) {
   if (site.snapshot) {
     try {
@@ -509,6 +536,8 @@ async function runCapture(page, site, targetFile) {
     await sleep(2000);
     await dismissCommonPopups(page);
     await handleFearGreed(page, site, targetFile);
+  } else if (site.name === 'Trading Economics Calendar') {
+    await handleTradingEconomicsCalendar(page, site, targetFile);
   } else if (site.url && site.url.includes('schrts.co')) {
     await handleSchrtsChart(page, site, targetFile);
   } else {
