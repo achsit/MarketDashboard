@@ -1,5 +1,12 @@
 [
   {
+    "name": "Uptrend Switch",
+    "url": "https://schrts.co/SjsGkuvI",
+    "file": "switch.png",
+    "waitAfterLoadMs": 5000,
+    "selector": "img"
+  },
+  {
     "name": "SPY",
     "url": "https://schrts.co/uicBsKei",
     "file": "spy.png",
