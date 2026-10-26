@@ -427,13 +427,21 @@ async function handleSchrtsChart(page, site, targetFile) {
 
 
 async function handleTradingEconomicsCalendar(page, site, targetFile) {
-  // Set cookie so only high-importance (3-star) events are shown
-  await page.context().addCookies([{
-    name: 'calendar-importance',
-    value: '3',
-    domain: '.tradingeconomics.com',
-    path: '/'
-  }]);
+  // 3-star importance + UTC+8 (480 minutes east of UTC; no DST)
+  await page.context().addCookies([
+    {
+      name: 'calendar-importance',
+      value: '3',
+      domain: '.tradingeconomics.com',
+      path: '/'
+    },
+    {
+      name: 'TECalendarOffset',
+      value: '480',
+      domain: '.tradingeconomics.com',
+      path: '/'
+    }
+  ]);
 
   await page.goto(site.url, {
     waitUntil: 'domcontentloaded',
