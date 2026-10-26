@@ -342,6 +342,35 @@
       background: #0f172a;
       border-radius: 12px;
     }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      width: 48px;
+      height: 72px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(12,18,29,.72);
+      color: var(--text);
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 1.6rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+    .lightbox-nav:hover {
+      background: rgba(125,211,252,.16);
+      border-color: rgba(125,211,252,.45);
+    }
+    .lightbox-nav.prev { left: 10px; }
+    .lightbox-nav.next { right: 10px; }
+    @media (max-width: 720px) {
+      .lightbox-nav { display: none; }
+      .lightbox { padding: 12px; }
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
 </head>
@@ -351,7 +380,7 @@
 	  <div class="hero-inner">
 		<div class="hero-top" id="heroTop">
 		  <h1>Market Dashboard</h1>
-		  <div class="sub">A single-page visual briefing arranged from price action to sentiment, breadth, market health, and upcoming macro events. First click enlarges a chart, then use the source button in the viewer to open its landing page.</div>
+		  <div class="sub">A single-page visual briefing arranged from price action to sentiment, breadth, market health, and upcoming macro events. Click a chart to enlarge it, then browse with ←/→ keys, the Prev/Next controls, or a swipe — use Open source site for the landing page.</div>
 		</div>
 		<nav class="toc">
 		  <a href="#performance">1. Market Performance</a>
@@ -498,6 +527,8 @@
   </main>
 
   <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button type="button" class="lightbox-nav prev" id="lightboxSidePrev" aria-label="Previous screenshot">‹</button>
+    <button type="button" class="lightbox-nav next" id="lightboxSideNext" aria-label="Next screenshot">›</button>
     <div class="lightbox-panel">
       <div class="lightbox-top">
         <div>
@@ -505,6 +536,8 @@
           <div class="lightbox-sub" id="lightboxSub">Dimensions</div>
         </div>
         <div class="lightbox-actions">
+          <button type="button" id="lightboxPrev" aria-label="Previous screenshot">← Prev</button>
+          <button type="button" id="lightboxNext" aria-label="Next screenshot">Next →</button>
           <a id="lightboxLink" href="#" target="_blank" rel="noopener noreferrer">Open source site</a>
           <button type="button" id="lightboxClose">Close</button>
         </div>
@@ -522,16 +555,38 @@
     const lightboxSub = document.getElementById('lightboxSub');
     const lightboxLink = document.getElementById('lightboxLink');
     const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const lightboxSidePrev = document.getElementById('lightboxSidePrev');
+    const lightboxSideNext = document.getElementById('lightboxSideNext');
+    const cards = [...document.querySelectorAll('.js-open')];
+    let currentIndex = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
 
-    document.querySelectorAll('.js-open').forEach(card => {
-      card.addEventListener('click', () => {
-        lightboxImg.src = card.dataset.img;
-        lightboxTitle.textContent = card.dataset.title;
-        lightboxSub.textContent = card.dataset.dim;
-        lightboxLink.href = card.dataset.link;
-        lightbox.classList.add('open');
-        lightbox.setAttribute('aria-hidden', 'false');
-      });
+    function showAt(index) {
+      if (!cards.length) return;
+      const n = cards.length;
+      currentIndex = ((index % n) + n) % n;
+      const card = cards[currentIndex];
+      lightboxImg.src = card.dataset.img;
+      lightboxTitle.textContent = card.dataset.title;
+      lightboxSub.textContent = card.dataset.dim;
+      lightboxLink.href = card.dataset.link;
+      lightbox.classList.add('open');
+      lightbox.setAttribute('aria-hidden', 'false');
+    }
+
+    function prevLightbox() {
+      showAt(currentIndex - 1);
+    }
+
+    function nextLightbox() {
+      showAt(currentIndex + 1);
+    }
+
+    cards.forEach((card, index) => {
+      card.addEventListener('click', () => showAt(index));
     });
 
     function closeLightbox() {
@@ -540,12 +595,51 @@
     }
 
     lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      prevLightbox();
+    });
+    lightboxNext.addEventListener('click', (e) => {
+      e.stopPropagation();
+      nextLightbox();
+    });
+    lightboxSidePrev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      prevLightbox();
+    });
+    lightboxSideNext.addEventListener('click', (e) => {
+      e.stopPropagation();
+      nextLightbox();
+    });
     lightbox.addEventListener('click', (e) => {
       if (e.target === lightbox) closeLightbox();
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevLightbox();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextLightbox();
+      }
     });
+
+    lightbox.addEventListener('touchstart', (e) => {
+      if (!lightbox.classList.contains('open') || !e.changedTouches.length) return;
+      touchStartX = e.changedTouches[0].clientX;
+      touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    lightbox.addEventListener('touchend', (e) => {
+      if (!lightbox.classList.contains('open') || !e.changedTouches.length) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+      if (dx < 0) nextLightbox();
+      else prevLightbox();
+    }, { passive: true });
 	
 	const hero = document.getElementById('hero');
 
