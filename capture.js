@@ -451,6 +451,17 @@ async function handleTradingEconomicsCalendar(page, site, targetFile) {
   await sleep(site.waitAfterLoadMs || 8000);
   await dismissCommonPopups(page);
 
+  // Cookie alone is not always applied; force the timezone dropdown when needed.
+  const tzSelect = page.locator('#DropDownListTimezone');
+  if (await tzSelect.count()) {
+    const current = await tzSelect.inputValue().catch(() => '');
+    if (current !== '480') {
+      await tzSelect.selectOption('480');
+      await sleep(site.waitAfterLoadMs || 8000);
+      await dismissCommonPopups(page);
+    }
+  }
+
   // Extra wait for the filtered table
   await page.locator('table.table').first().waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
   await sleep(1500);
@@ -554,12 +565,17 @@ async function runCapture(page, site, targetFile) {
 }
 
 async function captureSite(browser, site) {
-  const context = await browser.newContext({
+  const contextOptions = {
     viewport: { width: 1800, height: 1500 },
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
     ignoreHTTPSErrors: true,
     deviceScaleFactor: 1
-  });
+  };
+  // TE calendar times follow the browser timezone unless TECalendarOffset is honored server-side.
+  if (site.name === 'Trading Economics Calendar') {
+    contextOptions.timezoneId = 'Asia/Shanghai';
+  }
+  const context = await browser.newContext(contextOptions);
 
   const page = await context.newPage();
   const targetFile = path.join(screenshotDir, site.file);
