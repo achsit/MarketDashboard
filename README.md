@@ -17,7 +17,7 @@ This project automatically captures screenshots of key financial dashboards and 
 
 ### Scan counts
 
-The capture job logs the latest counts for the two Finviz scan rules into `scan-history.json`, which is displayed on the dashboard and preserved as a rolling history over time.
+The capture job logs the latest counts for the two Finviz scan rules into `scan-history.json`, which is displayed on the dashboard and preserved as a rolling history over time. Counts are attributed by US/Eastern trading date. Collection tries Finviz first (reusing heatmap cookies, waiting out Cloudflare, and dumping debug artifacts on failure), then falls back to a TradingView scanner query with the same price/volume/weekly-performance filters when Finviz is blocked. A missing count on a trading day fails the workflow after screenshots/history are still committed, so the series cannot stall silently.
 
 ## How It Works
 

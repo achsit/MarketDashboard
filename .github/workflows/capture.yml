@@ -33,14 +33,17 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run capture script
+        id: capture
         run: node capture.js
 
       - name: List files after capture
+        if: always() && !cancelled()
         run: |
           ls -la screenshots
           find screenshots -maxdepth 2 -type f | sort
 
       - name: Commit updated screenshots
+        if: always() && !cancelled()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -49,22 +52,33 @@ jobs:
           git push
 
       - name: Prepare Pages output
+        if: always() && !cancelled()
         run: |
           mkdir -p pages
           cp index.html pages/
+          cp scan-history.json pages/
           cp -r screenshots pages/
 
       - name: Configure GitHub Pages
+        if: always() && !cancelled()
         uses: actions/configure-pages@v5
         with:
           enablement: true
 
       - name: Upload dashboard to GitHub Pages
+        if: always() && !cancelled()
         uses: actions/upload-pages-artifact@v3
         with:
           path: pages
 
       - name: Deploy dashboard to GitHub Pages
+        if: always() && !cancelled()
         id: deployment
         uses: actions/deploy-pages@v5
         continue-on-error: true
+
+      - name: Fail job if capture script failed
+        if: always() && steps.capture.outcome == 'failure'
+        run: |
+          echo "Capture script failed; screenshots/history were still committed when possible."
+          exit 1

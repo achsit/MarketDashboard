@@ -1,3 +1,4 @@
 node_modules/
 screenshots/_captioned/
+screenshots/scan-debug-*
 *.pdf

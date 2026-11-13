@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
 const { getTradingDateKey, isTradingDay } = require('./lib/trading-day');
+const { collectTradingViewScanCount } = require('./lib/tradingview-scan');
 
 const baseDir = __dirname;
 const screenshotDir = path.join(baseDir, 'screenshots');
@@ -284,57 +285,209 @@ function writeJsonFile(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n');
 }
 
+function browserContextOptions(extra = {}) {
+  return {
+    viewport: { width: 1800, height: 1500 },
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+    ignoreHTTPSErrors: true,
+    deviceScaleFactor: 1,
+    ...extra
+  };
+}
+
+function isCloudflareChallengeTitle(title) {
+  return /just a moment|attention required|cloudflare/i.test(title || '');
+}
+
+async function waitForCloudflareClear(page, timeoutMs = 90000) {
+  const started = Date.now();
+
+  while (Date.now() - started < timeoutMs) {
+    const title = await page.title().catch(() => '');
+    if (!isCloudflareChallengeTitle(title)) return title;
+    await sleep(1000);
+  }
+
+  const title = await page.title().catch(() => '');
+  throw new Error(`Cloudflare challenge did not clear after ${timeoutMs}ms (title: ${title || 'unknown'})`);
+}
+
+function parseScreenerTotalText(text) {
+  if (!text) return null;
+  const match = text.match(/\b([\d,]+)\s*\/\s*([\d,]+)\s*Total\b/i) || text.match(/\b([\d,]+)\s*Total\b/i);
+  if (!match) return null;
+  return Number((match[2] || match[1]).replace(/,/g, ''));
+}
+
+async function readScreenerTotal(page) {
+  const selectors = [
+    '#screener-total',
+    '#screener_views_table_wrapper #screener-total',
+    '[id*="screener-total"]',
+    'td#screener-total',
+    '.screener-pages',
+    '#screenerContent'
+  ];
+
+  for (const selector of selectors) {
+    try {
+      const locator = page.locator(selector).first();
+      if (!(await locator.count())) continue;
+      await locator.waitFor({ state: 'attached', timeout: 5000 }).catch(() => {});
+      const text = (await locator.innerText().catch(() => '')) || '';
+      const count = parseScreenerTotalText(text);
+      if (count !== null) {
+        return { count, text: text.trim(), selector };
+      }
+    } catch (_) {}
+  }
+
+  const bodyText = await page.locator('body').innerText().catch(() => '');
+  const count = parseScreenerTotalText(bodyText);
+  if (count !== null) {
+    return { count, text: bodyText.match(/[\d,/]+\s*Total/i)?.[0] || String(count), selector: 'body' };
+  }
+
+  return null;
+}
+
+async function dumpScanDebug(page, scan, error) {
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const base = path.join(screenshotDir, `scan-debug-${scan.key}-${stamp}`);
+
+  try {
+    await page.screenshot({ path: `${base}.png`, fullPage: true });
+    console.error(`Saved scan debug screenshot: ${path.basename(base)}.png`);
+  } catch (screenshotError) {
+    console.error(`Could not save scan debug screenshot: ${screenshotError.message}`);
+  }
+
+  try {
+    const title = await page.title().catch(() => '');
+    const url = page.url();
+    const html = await page.content().catch(() => '');
+    const snippet = html.slice(0, 4000);
+    fs.writeFileSync(
+      `${base}.txt`,
+      [
+        `label: ${scan.label}`,
+        `url: ${url}`,
+        `title: ${title}`,
+        `error: ${error.message}`,
+        '',
+        snippet
+      ].join('\n')
+    );
+    console.error(`Saved scan debug dump: ${path.basename(base)}.txt`);
+  } catch (dumpError) {
+    console.error(`Could not save scan debug dump: ${dumpError.message}`);
+  }
+}
+
 async function collectFinvizScanCount(page, scan) {
   await page.goto(scan.url, {
     waitUntil: 'domcontentloaded',
     timeout: 90000
   });
 
-  await page.locator('#screener-total').first().waitFor({
-    state: 'visible',
-    timeout: 30000
-  });
+  await waitForCloudflareClear(page);
+  await sleep(2500);
+  await dismissCommonPopups(page);
+  await dismissFinvizPopups(page);
 
-  const text = await page.locator('#screener-total').first().innerText();
-  const match = text.match(/\b(\d+)\s*\/\s*(\d+)\s*Total\b/i) || text.match(/\b(\d+)\s*Total\b/i);
-  const count = match ? Number((match[2] || match[1]).replace(/,/g, '')) : null;
+  const deadline = Date.now() + 45000;
+  let parsed = null;
 
-  if (count === null) {
-    throw new Error(`No scan count found for ${scan.label}: ${text}`);
+  while (Date.now() < deadline) {
+    parsed = await readScreenerTotal(page);
+    if (parsed) break;
+    await dismissFinvizPopups(page);
+    await sleep(1500);
   }
+
+  if (!parsed) {
+    const title = await page.title().catch(() => '');
+    throw new Error(`No scan count found for ${scan.label} (title: ${title || 'unknown'})`);
+  }
+
+  console.log(`Parsed ${scan.label} via ${parsed.selector}: ${parsed.text}`);
 
   return {
     key: scan.key,
     label: scan.label,
     url: scan.url,
-    count,
+    count: parsed.count,
     timestamp: new Date().toISOString(),
-    rawText: text.trim()
+    rawText: parsed.text
   };
 }
 
-async function captureScanCounts(browser) {
+async function warmFinvizSession(browser, storageState = null) {
+  const contextOptions = browserContextOptions({
+    viewport: { width: 1800, height: 1200 }
+  });
+  if (storageState) contextOptions.storageState = storageState;
+
+  const context = await browser.newContext(contextOptions);
+  const page = await context.newPage();
+
+  try {
+    console.log('Warming Finviz session before scan counts');
+    await page.goto('https://finviz.com/map?colorscale=colorblind', {
+      waitUntil: 'domcontentloaded',
+      timeout: 90000
+    });
+    await waitForCloudflareClear(page);
+    await sleep(2000);
+    await dismissCommonPopups(page);
+    await dismissFinvizPopups(page);
+    return await context.storageState();
+  } catch (error) {
+    console.error(`Finviz warm-up failed: ${error.message}`);
+    return storageState;
+  } finally {
+    await page.close();
+    await context.close();
+  }
+}
+
+async function collectScanCountWithFallback(browser, scan, storageState = null) {
+  const contextOptions = browserContextOptions({
+    viewport: { width: 1800, height: 1200 }
+  });
+  if (storageState) contextOptions.storageState = storageState;
+
+  const context = await browser.newContext(contextOptions);
+  const page = await context.newPage();
+
+  try {
+    console.log(`Collecting scan count via Finviz: ${scan.label}`);
+    const result = await collectFinvizScanCount(page, scan);
+    result.source = 'finviz';
+    return result;
+  } catch (error) {
+    console.error(`Finviz scan count failed for ${scan.label}: ${error.message}`);
+    await dumpScanDebug(page, scan, error);
+  } finally {
+    await page.close();
+    await context.close();
+  }
+
+  console.log(`Falling back to TradingView scanner for ${scan.label}`);
+  return collectTradingViewScanCount(scan);
+}
+
+async function captureScanCounts(browser, storageState = null) {
   const entries = [];
+  const warmedState = await warmFinvizSession(browser, storageState);
 
   for (const scan of scanDefinitions) {
-    const context = await browser.newContext({
-      viewport: { width: 1800, height: 1200 },
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
-      ignoreHTTPSErrors: true,
-      deviceScaleFactor: 1
-    });
-
-    const page = await context.newPage();
-
     try {
-      console.log(`Collecting scan count: ${scan.label}`);
-      const result = await collectFinvizScanCount(page, scan);
+      const result = await collectScanCountWithFallback(browser, scan, warmedState);
+      console.log(`Collected ${scan.label}: ${result.count} (source=${result.source})`);
       entries.push(result);
     } catch (error) {
       console.error(`Failed to collect scan count for ${scan.label}: ${error.message}`);
-    } finally {
-      await page.close();
-      await context.close();
     }
   }
 
@@ -342,15 +495,17 @@ async function captureScanCounts(browser) {
 }
 
 async function updateScanHistory(entries) {
-  if (!entries.length) return;
+  if (!entries.length) return { saved: false, skipped: [] };
 
   const data = readJsonFile(scanHistoryPath, { updatedAt: null, scans: {} });
   const timestamp = new Date().toISOString();
   let changed = false;
+  const skipped = [];
 
   for (const entry of entries) {
     if (!isTradingDay(entry.timestamp)) {
       console.log(`Skipping ${entry.label} count: ${entry.timestamp} is not a trading day (weekend/holiday)`);
+      skipped.push(entry.key);
       continue;
     }
 
@@ -360,10 +515,13 @@ async function updateScanHistory(entries) {
     const dateKey = getTradingDateKey(entry.timestamp);
     const existingIndex = history.findIndex(item => getTradingDateKey(item.timestamp) === dateKey);
 
+    const historyItem = { timestamp: entry.timestamp, count: entry.count };
+    if (entry.source) historyItem.source = entry.source;
+
     if (existingIndex >= 0) {
-      history[existingIndex] = { timestamp: entry.timestamp, count: entry.count };
+      history[existingIndex] = historyItem;
     } else {
-      history.push({ timestamp: entry.timestamp, count: entry.count });
+      history.push(historyItem);
     }
 
     scanState.history = history;
@@ -371,18 +529,37 @@ async function updateScanHistory(entries) {
     scanState.url = entry.url;
     scanState.count = entry.count;
     scanState.lastUpdated = entry.timestamp;
+    if (entry.source) scanState.source = entry.source;
     data.scans[key] = scanState;
     changed = true;
   }
 
   if (!changed) {
     console.log('No trading-day scan counts to save; skipping scan-history.json update');
-    return;
+    return { saved: false, skipped };
   }
 
   data.updatedAt = timestamp;
   writeJsonFile(scanHistoryPath, data);
   console.log(`Saved scan counts to ${scanHistoryPath}`);
+  return { saved: true, skipped };
+}
+
+function assertRequiredScanCounts(entries) {
+  const now = new Date().toISOString();
+  if (!isTradingDay(now)) {
+    console.log(`Non-trading day (${getTradingDateKey(now)} ET): scan count gaps are non-fatal`);
+    return;
+  }
+
+  const collected = new Set(entries.map(entry => entry.key));
+  const missing = scanDefinitions
+    .filter(scan => !collected.has(scan.key))
+    .map(scan => scan.label);
+
+  if (missing.length) {
+    throw new Error(`Missing scan counts on trading day ${getTradingDateKey(now)} ET: ${missing.join(', ')}`);
+  }
 }
 
 async function handleSchrtsChart(page, site, targetFile) {
@@ -565,12 +742,7 @@ async function runCapture(page, site, targetFile) {
 }
 
 async function captureSite(browser, site) {
-  const contextOptions = {
-    viewport: { width: 1800, height: 1500 },
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
-    ignoreHTTPSErrors: true,
-    deviceScaleFactor: 1
-  };
+  const contextOptions = browserContextOptions();
   // TE calendar times follow the browser timezone unless TECalendarOffset is honored server-side.
   if (site.name === 'Trading Economics Calendar') {
     contextOptions.timezoneId = 'Asia/Shanghai';
@@ -579,16 +751,23 @@ async function captureSite(browser, site) {
 
   const page = await context.newPage();
   const targetFile = path.join(screenshotDir, site.file);
+  let storageState = null;
 
   try {
     console.log(`Opening: ${site.name}`);
     await runCapture(page, site, targetFile);
+    if (isFinvizUrl(site.url)) {
+      storageState = await context.storageState();
+    }
   } catch (error) {
     console.error(`First try failed: ${site.name} -> ${error.message}`);
 
     try {
       await sleep(site.retryDelayMs || 3000);
       await runCapture(page, site, targetFile);
+      if (isFinvizUrl(site.url)) {
+        storageState = await context.storageState();
+      }
     } catch (retryError) {
       console.error(`Failed: ${site.name} -> ${retryError.message}`);
     }
@@ -596,6 +775,8 @@ async function captureSite(browser, site) {
     await page.close();
     await context.close();
   }
+
+  return storageState;
 }
 
 (async () => {
@@ -605,18 +786,26 @@ async function captureSite(browser, site) {
     args: ['--disable-http2']
   });
 
+  let finvizStorageState = null;
+
   try {
     for (const site of sites) {
-      await captureSite(browser, site);
+      const storageState = await captureSite(browser, site);
+      if (storageState) finvizStorageState = storageState;
     }
 
-    const scanEntries = await captureScanCounts(browser);
+    const scanEntries = await captureScanCounts(browser, finvizStorageState);
     await updateScanHistory(scanEntries);
 
     const stamp = new Date().toISOString();
     fs.writeFileSync(path.join(screenshotDir, 'last-updated.txt'), stamp);
     console.log(`Finished at ${stamp}`);
+
+    assertRequiredScanCounts(scanEntries);
   } finally {
     await browser.close();
   }
-})();
+})().catch(error => {
+  console.error(`Capture failed: ${error.message}`);
+  process.exitCode = 1;
+});
