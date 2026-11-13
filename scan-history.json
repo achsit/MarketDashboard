@@ -1,11 +1,11 @@
 {
-  "updatedAt": "2026-10-16T00:44:11.241Z",
+  "updatedAt": "2026-11-13T08:51:25.262Z",
   "scans": {
     "up20_5d": {
       "label": "Up 20% in 5 days",
       "url": "https://finviz.com/screener?v=210&p=d&f=ind_stocksonly,sh_avgvol_o100,sh_price_o5,ta_perf_1w20o&ft=4&ta=0&dr=m6&o=-perfytd",
-      "count": 10,
-      "lastUpdated": "2026-10-16T00:44:10.182Z",
+      "count": 77,
+      "lastUpdated": "2026-11-13T08:51:25.412Z",
       "history": [
         {
           "timestamp": "2026-08-17T15:16:01.215Z",
@@ -174,14 +174,20 @@
         {
           "timestamp": "2026-10-16T00:44:10.182Z",
           "count": 10
+        },
+        {
+          "timestamp": "2026-11-13T08:51:25.412Z",
+          "count": 77,
+          "source": "tradingview"
         }
-      ]
+      ],
+      "source": "tradingview"
     },
     "down20_5d": {
       "label": "Down 20% in 5 days",
       "url": "https://finviz.com/screener?v=210&p=d&f=ind_stocksonly,sh_avgvol_o100,sh_price_o5,ta_perf_1w20u&ft=4&ta=0&dr=m6&o=-perfytd",
-      "count": 41,
-      "lastUpdated": "2026-10-16T00:44:11.188Z",
+      "count": 67,
+      "lastUpdated": "2026-11-13T08:51:25.463Z",
       "history": [
         {
           "timestamp": "2026-08-17T15:16:02.613Z",
@@ -350,8 +356,14 @@
         {
           "timestamp": "2026-10-16T00:44:11.188Z",
           "count": 41
+        },
+        {
+          "timestamp": "2026-11-13T08:51:25.463Z",
+          "count": 67,
+          "source": "tradingview"
         }
-      ]
+      ],
+      "source": "tradingview"
     }
   }
 }
