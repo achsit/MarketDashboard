@@ -4,7 +4,11 @@
   "private": true,
   "description": "Automated website screenshot dashboard using Playwright",
   "scripts": {
-    "capture": "node capture.js"
+    "capture": "node capture.js",
+    "test:trading-day": "node scripts/test-trading-day.js",
+    "test:tradingview-scan": "node scripts/test-tradingview-scan.js",
+    "test": "npm run test:trading-day && npm run test:tradingview-scan",
+    "probe:scan-counts": "node scripts/probe-scan-counts.js"
   },
   "dependencies": {
     "playwright": "^1.54.2"
