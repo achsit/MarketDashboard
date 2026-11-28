@@ -58,6 +58,13 @@
     "selector": "canvas"
   },
   {
+    "name": "VXV:VIX",
+    "url": "https://schrts.co/ZXBXhKEs",
+    "file": "vxv-vix.png",
+    "waitAfterLoadMs": 5000,
+    "selector": "img"
+  },
+  {
     "name": "CNN Fear and Greed",
     "url": "https://edition.cnn.com/markets/fear-and-greed",
     "file": "fear-greed.png",
