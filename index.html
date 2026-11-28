@@ -240,7 +240,8 @@
 	  #sentiment .grid {
 		grid-template-columns: 1fr 1.3fr;
 		grid-template-areas:
-		  "fear aaii";
+		  "fear aaii"
+		  "vxv vxv";
 		align-items: stretch;
 	  }
 
@@ -250,6 +251,10 @@
 
 	  #sentiment .card-aaii {
 		grid-area: aaii;
+	  }
+
+	  #sentiment .card-vxv {
+		grid-area: vxv;
 	  }
 
 	  #sentiment .card-aaii .thumb {
@@ -488,6 +493,10 @@
         <button class="card js-open card-aaii" data-title="AAII Investor Sentiment" data-dim="Opinions of individual investors on where the market is heading in the next six months" data-img="screenshots/aaii.png" data-link="https://www.a1trading.com/free-data-dashboards/aaii-sentiment-survey/">
           <img class="thumb" src="screenshots/aaii.png" alt="AAII sentiment survey" width="1000" height="876">
           <div class="meta"><div><div class="title">AAII Investor Sentiment</div><div class="caption">Opinions of individual investors on where the market is heading in the next six months</div></div><div class="dim">A1Trading</div></div>
+        </button>
+        <button class="card w-12 js-open card-vxv" data-title="VXV:VIX" data-dim="3-month vs 1-month VIX term structure ratio" data-img="screenshots/vxv-vix.png" data-link="https://schrts.co/bRkIKAgS">
+          <img class="thumb" src="screenshots/vxv-vix.png" alt="VXV to VIX ratio chart" width="990" height="592">
+          <div class="meta"><div><div class="title">VXV:VIX</div><div class="caption">3-month vs 1-month VIX term structure ratio</div></div><div class="dim">Schrts</div></div>
         </button>
       </div>
     </section>

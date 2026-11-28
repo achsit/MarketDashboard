@@ -10,7 +10,7 @@ This project automatically captures screenshots of key financial dashboards and 
 
 1. **Market Performance** — SPY, QQQ, DIA, IWM, and MDY daily views from Schrts charts, plus Finviz daily/weekly sector heat maps
 2. **Market Monitor** — Stockbee market-health checklist
-3. **Market Sentiment** — CNN Fear & Greed Index and AAII Investor Sentiment Survey
+3. **Market Sentiment** — CNN Fear & Greed Index, AAII Investor Sentiment Survey, and VXV:VIX term structure ratio
 4. **Market Breadth** — US New Highs–Lows and SPX percent above 50/200-day MA
 5. **Economic Calendar** — StockCharts VIX exit indicator, Trading Economics, and Barchart futures trading calendars
 
